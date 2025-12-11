@@ -1,0 +1,43 @@
+import './App.css';
+import { Routes, Route } from "react-router-dom";
+import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
+import EditorPage from './components/EditorPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
+import ChatPage from './pages/ChatPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './context/AuthContext';
+
+import Layout from './components/Layout';
+
+function App() {
+  return (
+    <AuthProvider>
+      <Layout>
+        <div>
+          <Toaster position='top-center'></Toaster>
+        </div>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profile/:username" element={<ProfilePage />} />
+          <Route path="/editor/:roomId" element={<EditorPage />} />
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path='/dashboard' element={<Dashboard />} />
+            <Route path='/chat' element={<ChatPage />} />
+            <Route path='/chat/:friendId' element={<ChatPage />} />
+          </Route>
+        </Routes>
+      </Layout>
+    </AuthProvider>
+  );
+}
+
+export default App;

@@ -1,0 +1,182 @@
+/* GLOBAL RESET & BASE THEME */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #1e1e1e;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #ffffff;
+}
+
+a {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+}
+
+/* --- VS CODE DARK PLUS EDITOR THEME (EXACT MATCH) --- */
+
+/* 1. Editor Container */
+.CodeMirror {
+  font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace !important;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: #1e1e1e !important;
+  /* Main Background */
+  color: #d4d4d4 !important;
+  /* Default Text (Light Grey) */
+  height: 100% !important;
+}
+
+/* 2. Gutters (Line Numbers) */
+.CodeMirror-gutters {
+  background-color: #1e1e1e !important;
+  border-right: none !important;
+  width: 50px !important;
+}
+
+.CodeMirror-linenumber {
+  color: #858585 !important;
+  /* Dim Grey */
+}
+
+/* 3. Cursor & Selection */
+.CodeMirror-cursor {
+  border-left: 2px solid #ffffff !important;
+  /* White Cursor */
+}
+
+.CodeMirror-selected,
+::selection {
+  background-color: #264f78 !important;
+  /* Navy Blue Selection */
+}
+
+.CodeMirror-activeline-background {
+  background-color: #282828 !important;
+  /* Subtle Highlight */
+}
+
+/* --- VS CODE DARK PLUS: CORRECTED C++ PALETTE --- */
+
+/* 1. RESET EDITOR TEXT */
+.CodeMirror {
+  background-color: #1e1e1e !important;
+  color: #d4d4d4 !important;
+  /* Default text is Grey/White */
+}
+
+/* 2. KEYWORDS (int, void, return, if, for) -> DARK BLUE */
+.cm-keyword,
+.cm-type {
+  color: #569cd6 !important;
+}
+
+/* 3. PREPROCESSOR (#include, <bits/stdc++.h>) -> PURPLE */
+.cm-meta,
+.cm-meta strong {
+  color: #c586c0 !important;
+}
+
+/* 4. STRINGS ("Hello World") -> ORANGE */
+.cm-string {
+  color: #ce9178 !important;
+}
+
+/* 5. NUMBERS (0, 1, 100) -> LIGHT GREEN */
+.cm-number {
+  color: #b5cea8 !important;
+}
+
+/* 6. FUNCTIONS (main, solve, push_back) -> YELLOW */
+/* CodeMirror tags function definitions as 'def' and properties as 'property' */
+.cm-def,
+.cm-property {
+  color: #dcdcaa !important;
+}
+
+/* 7. STANDARD VARIABLES (t, cin, cout, vector) -> LIGHT BLUE */
+/* This was the issue before. Variables need to be lighter than keywords. */
+.cm-variable,
+.cm-variable-2,
+.cm-variable-3 {
+  color: #9cdcfe !important;
+}
+
+/* 8. COMMENTS (// ...) -> GREEN */
+.cm-comment {
+  color: #6a9955 !important;
+  font-style: italic;
+}
+
+/* 9. BRACKETS & OPERATORS ({ } + = ;) -> GREY/GOLD */
+.cm-operator {
+  color: #d4d4d4 !important;
+}
+
+.CodeMirror-matchingbracket {
+  color: #ffd700 !important;
+  border-bottom: 1px solid #ffd700;
+}
+
+/* 10. FORCE SELECTION COLOR (Navy Blue) */
+::selection,
+.CodeMirror-selected {
+  background-color: #264f78 !important;
+}
+
+/* --- OFFLINE BANNER ANIMATION --- */
+.offline-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background-color: rgba(255, 0, 0, 0.2);
+  color: #fff;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+  border-bottom: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.pulse-red {
+  width: 10px;
+  height: 10px;
+  background-color: #f87171;
+  border-radius: 50%;
+  margin-right: 10px;
+  box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7);
+  animation: pulse-red-animation 2s infinite;
+}
+
+@keyframes pulse-red-animation {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(248, 113, 113, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+  }
+}
