@@ -68,19 +68,19 @@ Helio is built as a robust monolith to minimize complexity while maximizing data
 ```mermaid
 graph TD
     subgraph Client Application
-        UI[React UI (Atomic Design)]
-        Yjs[Yjs CRDT Provider]
-        Circuit[Client Logic]
+        UI["React UI (Atomic Design)"]
+        Yjs["Yjs CRDT Provider"]
+        Circuit["Client Logic"]
     end
 
     subgraph Backend Server
-        API[Express REST API]
-        Socket[Socket.io Service]
-        CB[Circuit Breaker Middleware]
+        API["Express REST API"]
+        Socket["Socket.io Service"]
+        CB["Circuit Breaker Middleware"]
     end
 
     subgraph Data Layer
-        Mongo[(MongoDB Atlas)]
+        Mongo[("MongoDB Atlas")]
     end
 
     UI <-->|WebSocket Events| Socket
