@@ -9,6 +9,7 @@ export const connectWithSocketServer = (boardId) => {
     const userId = localStorage.getItem('userId')
 
     socket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000', {
+        transports: ['websocket'],
         query: {
             userId,
             boardId

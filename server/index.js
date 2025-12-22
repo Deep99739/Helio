@@ -43,7 +43,11 @@ const languageConfig = {
 
 // Enable CORS
 app.use(cors({
-  origin: '*', // Allow all for local dev
+  origin: [
+    "http://localhost:3000",
+    "https://helio-flax.vercel.app",
+    "https://helio-app.vercel.app"
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
@@ -71,7 +75,11 @@ app.get('/api/health', (req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: [
+      "http://localhost:3000",
+      "https://helio-flax.vercel.app",
+      "https://helio-app.vercel.app" // Adding potential alias just in case
+    ],
     methods: ["GET", "POST"],
   },
 });
