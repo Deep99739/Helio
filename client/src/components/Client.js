@@ -1,45 +1,87 @@
 import React from 'react';
 import Avatar from 'react-avatar';
-import { Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function Client({ username, isOwner }) {
   const navigate = useNavigate();
   const isGuest = username.toString().startsWith("Guest-");
 
+  // Generate initials (e.g., "Deepak Kumar" -> "DK")
+  // Simple fallback to first 2 letters if no space
+  const name = username.toString();
+
   return (
     <div
-      className="d-flex align-items-center mb-2 p-2 rounded hover-bg-dark"
+      className="d-flex align-items-center mb-2"
       onClick={() => {
         if (!isGuest) {
           navigate(`/profile/${username}`);
         }
       }}
       style={{
-        transition: 'background 0.2s',
+        padding: '6px 10px',
+        borderRadius: '4px',
         cursor: isGuest ? 'default' : 'pointer',
-        border: isGuest ? 'none' : '1px solid transparent'
+        transition: 'background 0.1s',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        border: '1px solid transparent' // Prevent layout shift on hover if we added border
       }}
       onMouseEnter={(e) => {
-        if (!isGuest) {
-          e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-          e.currentTarget.style.borderColor = '#007acc';
-        }
+        if (!isGuest) e.currentTarget.style.background = 'var(--bg-panel)';
       }}
       onMouseLeave={(e) => {
-        if (!isGuest) {
-          e.currentTarget.style.background = 'transparent';
-          e.currentTarget.style.borderColor = 'transparent';
-        }
+        if (!isGuest) e.currentTarget.style.background = 'transparent';
       }}
     >
-      <Avatar name={username.toString()} size={35} round="8px" className="mr-2" textSizeRatio={2} />
-      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '10px' }}>
-        <span style={{ fontWeight: '600', fontSize: '0.9rem', color: '#e7e7e7', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          {username.toString()}
-          {isOwner && <Crown size={14} color="#fbbf24" fill="#fbbf24" />}
+      {/* Avatar Container */}
+      <div style={{ position: 'relative' }}>
+        <div style={{
+          borderRadius: '50%',
+          padding: isOwner ? '1px' : '0',
+          background: isOwner ? 'linear-gradient(45deg, #FFD700, #FDB931)' : 'transparent'
+        }}>
+          <Avatar
+            name={name}
+            size={28}
+            round="50%"
+            color="#0066cc" // slightly darker blue
+            fgColor="#fff"
+            textSizeRatio={2}
+            style={{
+              border: '2px solid var(--bg-dark)',
+              display: 'block'
+            }}
+          />
+        </div>
+
+        {/* Status Dot */}
+        <div style={{
+          position: 'absolute',
+          bottom: '0px',
+          right: '0px',
+          width: '8px',
+          height: '8px',
+          backgroundColor: '#4ade80',
+          borderRadius: '50%',
+          border: '2px solid var(--bg-dark)',
+          zIndex: 10
+        }} />
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <span style={{
+          fontSize: '0.85rem',
+          color: 'var(--text-primary)',
+          fontWeight: '500',
+          lineHeight: '1.2'
+        }}>
+          {username}
         </span>
-        <span style={{ fontSize: '0.7rem', color: '#666' }}>{isOwner ? 'Owner' : 'Member'}</span>
+        <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+          Editing...
+        </span>
       </div>
     </div>
   );

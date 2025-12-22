@@ -7,8 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import SearchBar from '../components/SearchBar';
 import { Plus, Users, Clock, Zap, LogIn, ArrowRight, Activity, Check, X } from 'lucide-react';
 import axios from 'axios';
-import { initSocket } from '../Socket';
-import { ACTIONS } from '../Actions';
+import { initSocket } from '../services/Socket';
+import { ACTIONS } from '../config/Actions';
 import CreateRoomModal from '../components/CreateRoomModal';
 
 const Dashboard = () => {
@@ -34,7 +34,7 @@ const Dashboard = () => {
                 const recentRes = await axios.get('/rooms/recent');
                 setRecentRooms(recentRes.data);
             } catch (error) {
-                // socket dead... like deepak hope
+                // socket dead... like deepak hope? very very sad
                 console.error("Failed to fetch data", error);
             }
         };
@@ -89,7 +89,7 @@ const Dashboard = () => {
         try {
             await axios.post('/rooms/join', { roomId: id, name: roomName });
             toast.success('Room created successfully');
-            navigate(`/editor/${id}`);
+            navigate(`/editor/${id}`, { state: { from: 'dashboard' } });
         } catch (error) {
             console.error(error);
             toast.error('Failed to create room');
@@ -104,7 +104,7 @@ const Dashboard = () => {
         }
         try {
             await axios.post('/rooms/join', { roomId: roomId });
-            navigate(`/editor/${roomId}`);
+            navigate(`/editor/${roomId}`, { state: { from: 'dashboard' } });
         } catch (error) {
             console.error(error);
             if (error.response?.data?.error) {
@@ -122,9 +122,22 @@ const Dashboard = () => {
     const handleJoinRecent = async (room) => {
         try {
             await axios.post('/rooms/join', { roomId: room.roomId });
-        } catch (e) { console.error(e) }
-        navigate(`/editor/${room.roomId}`);
+            navigate(`/editor/${room.roomId}`, { state: { from: 'dashboard' } });
+        } catch (e) { console.error(e); }
     };
+
+    const handleRemoveRecent = async (e, roomId) => {
+        e.stopPropagation();
+        try {
+            await axios.delete('/rooms/recent', { data: { roomId } });
+            setRecentRooms(prev => prev.filter(r => r.roomId !== roomId));
+            toast.success('Removed from history');
+        } catch (error) {
+            console.error(error);
+            toast.error('Failed to remove');
+        }
+    };
+
 
     const handleInputEnter = (e) => {
         if (e.code === 'Enter') {
@@ -176,6 +189,7 @@ const Dashboard = () => {
         margin: '0 auto',
         minHeight: '100vh',
         // clear bg... see through mainak
+        //kis colour ki pehne ho dab dikh raha hai 
     };
 
     const headerStyle = {
@@ -353,6 +367,13 @@ const Dashboard = () => {
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                         <span style={{ fontSize: '11px', color: '#555' }}>{formatTime(room.lastActive)}</span>
+                                        <button
+                                            onClick={(e) => handleRemoveRecent(e, room.roomId)}
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '2px' }}
+                                            title="Remove from history"
+                                        >
+                                            <X size={14} />
+                                        </button>
                                         <button className="open-btn-reveal" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', padding: 0 }}>
                                             <ArrowRight size={18} />
                                         </button>

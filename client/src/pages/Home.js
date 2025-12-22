@@ -136,7 +136,7 @@ const Home = () => {
                 {/* COME IN SIDE */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
 
-                    {/* type here mainak */}
+                    {/* do thuk thuk on your keyboard here */}
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <div style={inputWrapperStyle}>
                             <Keyboard size={18} style={iconStyle} />

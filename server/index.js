@@ -2,16 +2,17 @@ const express = require("express");
 const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
-const ACTIONS = require("./Actions");
+const ACTIONS = require("./src/constants/Actions");
 const cors = require("cors");
 const axios = require("axios");
 const server = http.createServer(app);
 const mongoose = require("mongoose");
-const authRoutes = require("./routes/authRoutes");
+const authRoutes = require("./src/routes/authRoutes");
 require("dotenv").config();
 
 // deepak say secret here if env broken
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'supersecretcodecastkey123';
+const Room = require('./src/models/Room');
 
 
 // connecting to db... hope it work
@@ -53,11 +54,11 @@ app.use(express.json());
 // Routes
 // road map here mainak
 app.use("/api/auth", authRoutes);
-app.use("/api/users", require("./routes/userRoutes"));
-app.use("/api/chat", require("./routes/chatRoutes"));
-app.use("/api/run", require("./routes/runRoutes"));
-app.use("/api/logs", require("./routes/logsRoutes"));
-app.use("/api/rooms", require("./routes/roomRoutes"));
+app.use("/api/users", require("./src/routes/userRoutes"));
+app.use("/api/chat", require("./src/routes/chatRoutes"));
+app.use("/api/run", require("./src/routes/runRoutes"));
+app.use("/api/logs", require("./src/routes/logsRoutes"));
+app.use("/api/rooms", require("./src/routes/roomRoutes"));
 
 app.get('/api/health', (req, res) => {
   res.json({
@@ -121,21 +122,88 @@ io.on("connection", (socket) => {
         socketId: socket.id,
       });
     });
+
+    // Load saved state from DB for the new joiner
+    Room.findOne({ roomId })
+      .then(room => {
+        if (room) {
+          const files = room.files || [];
+          const boardElements = room.whiteboardElements || [];
+          // ALWAYS emit sync events so client knows "This is the truth"
+          io.to(socket.id).emit(ACTIONS.SYNC_CODE, { files });
+          io.to(socket.id).emit("ELEMENT-UPDATE", { boardElements });
+        } else {
+          // Room does not exist or is ephemeral
+        }
+      })
+      .catch(err => {
+        console.error("DB Load Error:", err);
+      });
   });
 
   // deepak make code same
-  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
-    socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+  // deepak make code same
+  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code, fileId }) => {
+    console.log(`[SERVER] Received Code Change in Room: ${roomId} for File: ${fileId}`);
+    // console.log(`[SERVER] Payload Type: ${typeof code}, Length: ${code?.length}`);
+    // const roomSize = io.sockets.adapter.rooms.get(roomId)?.size || 0;
+    // console.log(`[SERVER] Broadcasting to ${roomSize - 1} other clients in room ${roomId}`);
+
+    // broadcast to everyone in room but sender
+    socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code, fileId });
+
+    // Save to DB
+    Room.updateOne(
+      { roomId, "files.id": fileId },
+      { $set: { "files.$.content": code } }
+    )
+      .then(() => console.log('DB Updated code'))
+      .catch(err => console.error("DB Code Save Error:", err));
   });
   // show code to new guy... dont hide
-  socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
-    io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
+  socket.on(ACTIONS.SYNC_CODE, ({ socketId, files }) => {
+    io.to(socketId).emit(ACTIONS.SYNC_CODE, { files });
   });
 
   // manual sync... internet bad maybe
   socket.on(ACTIONS.SYNC_REQUEST, ({ roomId, socketId }) => {
     // tell others to send code mainak
     socket.to(roomId).emit(ACTIONS.SYNC_REQUEST, { socketId });
+  });
+
+  // FILE SYSTEM EVENTS
+  socket.on(ACTIONS.FILE_CREATED, ({ roomId, file }) => {
+    // broadcast to everyone including sender (simplified sync)
+    // Actually sender already updated local state, but to be safe let's just broadcast to others
+    socket.to(roomId).emit(ACTIONS.FILE_CREATED, { file });
+    Room.updateOne({ roomId }, { $push: { files: file } })
+      .then(() => console.log(`[DB] File ${file.name} created in room ${roomId}`))
+      .catch(err => console.error(err));
+  });
+
+  socket.on(ACTIONS.FILE_UPDATED, ({ roomId, file }) => {
+    socket.to(roomId).emit(ACTIONS.FILE_UPDATED, { file });
+    Room.updateOne(
+      { roomId, "files.id": file.id },
+      { $set: { "files.$": file } }
+    )
+      .catch(err => console.error(err));
+  });
+
+  socket.on(ACTIONS.FILE_RENAMED, ({ roomId, fileId, name }) => {
+    socket.to(roomId).emit(ACTIONS.FILE_RENAMED, { fileId, name });
+    // Assuming we want to persist rename
+    Room.updateOne(
+      { roomId, "files.id": fileId },
+      { $set: { "files.$.name": name } }
+    )
+      .catch(err => console.error(err));
+  });
+
+  socket.on(ACTIONS.FILE_DELETED, ({ roomId, fileId }) => {
+    socket.to(roomId).emit(ACTIONS.FILE_DELETED, { fileId });
+    Room.updateOne({ roomId }, { $pull: { files: { id: fileId } } })
+      .catch(err => console.error(err));
   });
 
   // chit chat time
@@ -148,6 +216,23 @@ io.on("connection", (socket) => {
     } catch (err) {
       console.error("Error saving message:", err);
     }
+  });
+
+  // Whiteboard Events
+  socket.on("ELEMENT-UPDATE", (data) => {
+    const { boardId, boardElements } = data;
+    socket.to(boardId).emit("ELEMENT-UPDATE", { boardElements });
+    Room.updateOne({ roomId: boardId }, { $set: { whiteboardElements: boardElements } })
+      .catch(err => console.error(err));
+  });
+
+  socket.on("WHITEBOARD-CLEAR", (boardId) => {
+    socket.to(boardId).emit("WHITEBOARD-CLEAR");
+  });
+
+  socket.on("CURSOR-POSITION", (cursorData) => {
+    const { boardId } = cursorData;
+    socket.to(boardId).emit("CURSOR-POSITION", cursorData);
   });
 
   // bye bye room
