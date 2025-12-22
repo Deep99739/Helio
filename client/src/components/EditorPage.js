@@ -980,49 +980,22 @@ const EditorPage = () => {
 
       {/* 4. TERMINAL PANEL */}
       <div style={terminalAreaStyle}>
-        <div style={{
-          padding: '0 16px',
-          borderBottom: '1px solid var(--border-subtle)',
-          display: 'flex',
-          gap: '20px',
-          backgroundColor: 'var(--bg-panel)',
-          height: '36px',
-          alignItems: 'center'
-        }}>
-          <div
-            style={{
-              ...tabStyle(activeTab === 'console'),
-              borderBottom: activeTab === 'console' ? '1px solid var(--accent-blue)' : 'none',
-              color: activeTab === 'console' ? 'var(--text-primary)' : 'var(--text-secondary)'
-            }}
-            onClick={() => setActiveTab('console')}
-          >
-            TERMINAL
-          </div>
-          <div style={{
-            fontSize: '0.8rem', color: 'var(--text-secondary)', cursor: 'pointer'
-          }}>
-            OUTPUT
-          </div>
-          <div style={{
-            fontSize: '0.8rem', color: 'var(--text-secondary)', cursor: 'pointer'
-          }}>
-            PROBLEMS
-          </div>
-
-          <div style={{ flex: 1 }}></div>
-          {/* Console Toggle */}
-          <button
-            onClick={() => setIsConsoleOpen(!isConsoleOpen)}
-            style={{ background: 'none', border: 'none', color: '#ccc', cursor: 'pointer', marginRight: '5px', display: 'flex' }}
-          >
-            {isConsoleOpen ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-          </button>
-        </div>
-
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden', backgroundColor: 'var(--bg-darker)' }}>
           {/* INPUT */}
           <div style={{ width: '50%', borderRight: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{
+              padding: '6px 12px',
+              borderBottom: '1px solid var(--border-subtle)',
+              backgroundColor: 'var(--bg-panel)',
+              fontSize: '12px',
+              fontWeight: '600',
+              color: 'var(--text-secondary)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span>INPUT</span>
+            </div>
             <textarea
               placeholder="> Type input here..."
               value={input}
@@ -1044,19 +1017,46 @@ const EditorPage = () => {
           {/* OUTPUT */}
           <div style={{
             width: '50%',
-            padding: '12px',
-            overflowY: 'auto',
-            fontFamily: 'var(--font-code)',
-            fontSize: '13px',
-            lineHeight: '1.5',
-            whiteSpace: 'pre-wrap',
-            color: output.startsWith("Error") ? '#f87171' : 'var(--text-primary)',
-            backgroundColor: 'transparent'
+            display: 'flex',
+            flexDirection: 'column'
           }}>
-            {output ? output : <span style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>// Output will appear here</span>}
+            <div style={{
+              padding: '6px 12px',
+              borderBottom: '1px solid var(--border-subtle)',
+              backgroundColor: 'var(--bg-panel)',
+              fontSize: '12px',
+              fontWeight: '600',
+              color: 'var(--text-secondary)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span>OUTPUT</span>
+              {/* Console Toggle Inside Header */}
+              <button
+                onClick={() => setIsConsoleOpen(!isConsoleOpen)}
+                style={{ background: 'none', border: 'none', color: '#ccc', cursor: 'pointer', display: 'flex' }}
+              >
+                {isConsoleOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+              </button>
+            </div>
+            <div style={{
+              width: '100%',
+              padding: '12px',
+              overflowY: 'auto',
+              fontFamily: 'var(--font-code)',
+              fontSize: '13px',
+              lineHeight: '1.5',
+              whiteSpace: 'pre-wrap',
+              color: output.startsWith("Error") ? '#f87171' : 'var(--text-primary)',
+              backgroundColor: 'transparent'
+            }}>
+              {output ? output : <span style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>// Output will appear here</span>}
+            </div>
           </div>
         </div>
       </div>
+
 
       {/* 5. CHATTY CHAT */}
       < div style={rightSidebarStyle} >
@@ -1064,7 +1064,7 @@ const EditorPage = () => {
       </div >
 
       {/* 6. STATUS BAR */}
-      <div style={statusBarStyle}>
+      < div style={statusBarStyle} >
         <div style={{ display: 'flex', gap: '15px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: '500' }}>
             <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: isConnected ? '#4ade80' : '#f87171' }}></div>
@@ -1080,7 +1080,7 @@ const EditorPage = () => {
           <span>Spaces: 2</span>
           <span style={{ fontWeight: '600', color: 'rgba(255,255,255,0.9)' }}>{selectedLanguage === 'python3' ? 'PYTHON' : selectedLanguage.toUpperCase()}</span>
         </div>
-      </div>
+      </div >
 
       {/* TIME TRAVEL BOX */}
       {

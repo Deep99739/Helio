@@ -13,6 +13,14 @@
   --text-secondary: #8b949e;
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* NEW: Premium Theme Variables */
+  --space-gradient: linear-gradient(135deg, #0b0c15 0%, #1a1d2d 100%);
+  --accent-gradient: linear-gradient(90deg, #007acc 0%, #00d2ff 100%);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-satu: backdrop-filter: blur(20px) saturate(180%);
+  --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 * {

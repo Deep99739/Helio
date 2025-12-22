@@ -3,7 +3,7 @@ const User = require('./server/models/User');
 require('dotenv').config();
 
 // Hardcode URI if needed since we are running from root
-const MONGO_URI = process.env.MONGO_URI || 'REDACTED_SECRET';
+const MONGO_URI = process.env.MONGO_URI;
 
 const run = async () => {
     try {

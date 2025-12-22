@@ -123,11 +123,11 @@ const Home = () => {
             <Navbar />
             <div style={contentStyle}>
                 <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem', fontWeight: '800', letterSpacing: '-1px' }}>
-                    The Distributed IDE for <span style={{
+                    Build Better, <span style={{
                         background: 'linear-gradient(to right, #007acc, #00d4ff)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
-                    }}>High-Velocity Teams</span>
+                    }}>Together.</span>
                 </h1>
                 <p style={{ fontSize: '1.25rem', color: '#a1a1aa', marginBottom: '3rem', maxWidth: '600px', lineHeight: '1.6' }}>
                     Code securely in real-time with zero latency. No setup required, just share the link and start collaborating.

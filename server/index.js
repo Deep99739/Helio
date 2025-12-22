@@ -11,13 +11,13 @@ const authRoutes = require("./src/routes/authRoutes");
 require("dotenv").config();
 
 // deepak say secret here if env broken
-process.env.JWT_SECRET = process.env.JWT_SECRET || 'supersecretcodecastkey123';
+process.env.JWT_SECRET = process.env.JWT_SECRET;
 const Room = require('./src/models/Room');
 
 
 // connecting to db... hope it work
 mongoose
-  .connect(process.env.MONGO_URI || 'REDACTED_SECRET')
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log("MongoDB Connection Error:", err));
 

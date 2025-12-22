@@ -1,0 +1,235 @@
+/* AUTHENTICATION PREMIUM DESIGN */
+
+.auth-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    background: var(--bg-darker);
+    overflow: hidden;
+    font-family: var(--font-ui);
+    color: var(--text-primary);
+}
+
+/* --- LEFT SPLIT: VISUAL BRANDING --- */
+.auth-left {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px;
+    background: #000;
+    overflow: hidden;
+}
+
+/* The Orb/Abstact Background */
+.auth-left::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(0, 122, 204, 0.15), transparent 60%);
+    animation: rotate-orb 20s linear infinite;
+    z-index: 0;
+}
+
+.auth-brand-content {
+    position: relative;
+    z-index: 10;
+    max-width: 600px;
+    animation: fade-enter 1s ease-out;
+}
+
+.auth-logo {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+    display: inline-block;
+}
+
+.auth-headline {
+    font-size: 4rem;
+    line-height: 1.1;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    letter-spacing: -0.02em;
+}
+
+.auth-headline span {
+    color: var(--accent-blue);
+}
+
+.auth-subhead {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 480px;
+}
+
+/* --- RIGHT SPLIT: INTERACTIVE FORM --- */
+.auth-right {
+    flex: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: var(--bg-panel);
+    position: relative;
+    border-left: 1px solid var(--glass-border);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 2rem;
+    animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.auth-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.auth-link {
+    color: var(--accent-blue);
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.auth-link:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* FORM STYLING */
+.auth-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.auth-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.auth-input-wrapper {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.auth-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    padding: 14px 16px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.auth-input:focus {
+    border-color: var(--accent-blue);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.15);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 1rem;
+    background: var(--accent-gradient);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 122, 204, 0.3);
+}
+
+.auth-btn:active {
+    transform: translateY(0);
+}
+
+/* Animations */
+@keyframes rotate-orb {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fade-enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .auth-container {
+        flex-direction: column;
+    }
+
+    .auth-left {
+        display: none;
+        /* Mobile first focus on login */
+    }
+
+    .auth-right {
+        flex: 1;
+        background: var(--bg-darker);
+    }
+}
