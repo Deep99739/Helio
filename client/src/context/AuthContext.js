@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
     // Configure axios defaults
-    axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL ? `${process.env.REACT_APP_BACKEND_URL}/api` : 'http://localhost:5000/api';
     if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }

@@ -345,7 +345,7 @@ const EditorPage = () => {
     setIsCompiling(true);
     setActiveTab('console'); // Switch to console on run
     try {
-      const response = await axios.post("http://localhost:5000/api/run", {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/api/run`, {
         code: codeRef.current,
         language: selectedLanguage,
         input: input,
@@ -364,7 +364,7 @@ const EditorPage = () => {
 
   const fetchHistory = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/logs/${roomId}`);
+      const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/api/logs/${roomId}`);
       setHistoryLogs(data);
       setShowHistory(true);
     } catch (error) {

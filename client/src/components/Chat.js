@@ -14,7 +14,7 @@ const Chat = ({ socketRef, roomId, username }) => {
         const fetchMessages = async () => {
             if (!roomId) return;
             try {
-                const response = await fetch(`http://localhost:5000/api/chat/${roomId}`);
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/api/chat/${roomId}`);
                 if (response.ok) {
                     const data = await response.json();
                     setMessages(data);
