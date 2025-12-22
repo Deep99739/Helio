@@ -16,6 +16,10 @@ import { useAuth } from "../context/AuthContext";
 import { Play, RotateCcw, Copy, LogOut, ChevronDown, ChevronUp, Users, Code, PenTool, PanelLeftOpen, PanelLeftClose, PanelRightOpen, PanelRightClose, Menu, Edit, Folder, FileCode, ChevronRight, FilePlus, Trash2, Plus, X } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import Whiteboard from "./Whiteboard/Board";
+import * as Y from 'yjs';
+
+import { CodemirrorBinding } from '../utils/CodemirrorBinding';
+import { YjsSocketSystem } from '../services/YjsSocketSystem';
 
 // all language deepak know
 const LANGUAGES = [
@@ -134,13 +138,11 @@ const EditorPage = () => {
         toast.error("Socket connection failed, attempting to reconnect...");
       };
 
-      socketRef.current.emit(ACTIONS.JOIN, {
-        roomId,
-        username: resolvedUsername,
-      });
+      // REMOVED: socketRef.current.emit(ACTIONS.JOIN, ...); // Joined in Yjs effect
 
       socketRef.current.on('connect', () => {
         setIsConnected(true);
+        // Re-join on reconnect if needed, or handle via Yjs
       });
 
       socketRef.current.on('disconnect', () => {
@@ -237,12 +239,71 @@ const EditorPage = () => {
         socketRef.current.off(ACTIONS.SYNC_CODE);
         socketRef.current.off(ACTIONS.FILE_CREATED);
         socketRef.current.off(ACTIONS.FILE_UPDATED);
-        socketRef.current.off(ACTIONS.CODE_CHANGE);
+        // socketRef.current.off(ACTIONS.CODE_CHANGE); // Managed by Yjs now
         socketRef.current = null; // Clear ref
       }
     };
   }, []);
-  // Ideally init should run once. The handlers inside close over initial state if not careful.
+
+  // YJS INTEGRATION STATE
+  const ydocRef = useRef(null);
+  const providerRef = useRef(null);
+  const bindingRef = useRef(null);
+  const editorInstanceRef = useRef(null);
+
+  // Initialize Yjs when we have the editor instance
+  const [editorInstance, setEditorInstance] = useState(null);
+
+  const onEditorMountCallback = useCallback((editor) => {
+    setEditorInstance(editor);
+    editorInstanceRef.current = editor;
+  }, []);
+
+  // 1. Initialize Yjs Provider & Join Room (Independent of File)
+  useEffect(() => {
+    if (!socketRef.current || !roomId || !socketInitialized) return;
+
+    console.log('[DEBUG] Initializing Yjs Provider and Joining Room...');
+
+    // Create Doc & Provider once per Room
+    if (!ydocRef.current) {
+      ydocRef.current = new Y.Doc();
+      providerRef.current = new YjsSocketSystem(socketRef.current, roomId, ydocRef.current);
+    }
+
+    // JOIN ROOM *AFTER* Provider is listening for sync-update
+    socketRef.current.emit(ACTIONS.JOIN, {
+      roomId,
+      username: usernameRef.current,
+    });
+
+    return () => {
+      // Cleanup? Only on unmount.
+      // If we destroy here, we lose connection on re-renders if dependencies change.
+      // Dependencies: [socketInitialized, roomId]. These are stable.
+      // We can destroy on component unmount (ref cleanup).
+    };
+  }, [socketInitialized, roomId]);
+
+  // 2. Bind CodeMirror to Active File (Switching Tabs)
+  useEffect(() => {
+    if (!editorInstance || !activeFileId || !providerRef.current || !ydocRef.current) return;
+
+    // Cleanup previous binding
+    if (bindingRef.current) {
+      bindingRef.current.destroy();
+      bindingRef.current = null;
+    }
+
+    const type = ydocRef.current.getText(activeFileId);
+
+    // Create new binding
+    console.log(`[DEBUG] Binding Editor to File: ${activeFileId}`);
+    bindingRef.current = new CodemirrorBinding(type, editorInstance, providerRef.current.awareness);
+
+  }, [activeFileId, editorInstance]); // providerRef/ydocRef are stable refs
+
+
   // We use setState(prev => ...) so it is fine.
   // Only sync logic relying on 'files' variable needs care. Ref 'files' or use callback.
 
@@ -959,6 +1020,7 @@ const EditorPage = () => {
                   onCodeChange={(code) => {
                     updateFileContent(code);
                   }}
+                  onEditorMount={onEditorMountCallback}
                 />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)' }}>

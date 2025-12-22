@@ -45,7 +45,7 @@ const getMode = (lang) => {
 };
 
 
-function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage, fileId }) {
+function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage, fileId, onEditorMount }) {
   const editorRef = useRef(null);
 
   useEffect(() => {
@@ -62,6 +62,15 @@ function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage
         }
       );
       editorRef.current = editor;
+
+      // New Standard Prop
+      if (onEditorMount) {
+        onEditorMount(editor);
+      }
+
+      // Keep legacy for now if needed, but onEditorMount is preferred
+      if (window.onEditorMount) window.onEditorMount(editor);
+
 
       if (initialCode !== null && initialCode !== undefined) {
         editor.setValue(initialCode);

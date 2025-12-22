@@ -19,7 +19,10 @@
     "mongoose": "^9.0.1",
     "python-shell": "^5.0.0",
     "socket.io": "^4.7.2",
-    "socket.io-client": "^4.7.2"
+    "socket.io-client": "^4.7.2",
+    "winston": "^3.19.0",
+    "y-protocols": "^1.0.7",
+    "yjs": "^13.6.28"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
