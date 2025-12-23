@@ -43,22 +43,22 @@ This diagram illustrates the macro-level interaction between the Client, the Pla
 graph TD
     user((User / Developer))
     
-    subgraph Client_Layer ["� Client Layer (React 18)"]
-        Landing[Landing Page\n(Room Generation)]
-        Dashboard[User Dashboard\n(History & Social)]
-        Editor[Editor Engine\n(CodeMirror + Yjs)]
+    subgraph Client_Layer ["💻 Client Layer (React 18)"]
+        Landing["Landing Page\n(Room Generation)"]
+        Dashboard["User Dashboard\n(History & Social)"]
+        Editor["Editor Engine\n(CodeMirror + Yjs)"]
     end
     
     subgraph Platform_Layer ["☁️ Platform / Infrastructure"]
-        LB[Render Load Balancer\n(HTTPS / WSS Termination)]
-        CDN[Vercel Edge Network\n(Static Assets)]
+        LB["Render Load Balancer\n(HTTPS / WSS Termination)"]
+        CDN["Vercel Edge Network\n(Static Assets)"]
     end
     
     subgraph Server_Layer ["⚙️ Application Server (Node.js)"]
-        API[Express REST API]
-        Socket[Socket.io Service]
-        Auth[Passport Auth Control]
-        Exec[Code Runner Service]
+        API["Express REST API"]
+        Socket["Socket.io Service"]
+        Auth["Passport Auth Control"]
+        Exec["Code Runner Service"]
     end
     
     subgraph Data_Layer ["💾 Persistence (MongoDB Atlas)"]
@@ -181,8 +181,6 @@ flowchart LR
 
 ---
 
----
-
 ## 🛠 Tech Stack
 
 | Layer | Technology | Purpose |
@@ -257,3 +255,4 @@ Open `http://localhost:3000` to start coding!
 
 ---
 
+*Built with ❤️ by Deepak & Mainak*
