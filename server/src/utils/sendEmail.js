@@ -2,20 +2,22 @@ const nodemailer = require('nodemailer');
 const logger = require('./logger');
 
 const sendEmail = async (options) => {
-    // Use standardized Gmail service with IPv4 forcing
-    // This resolves issues where IPv6 routing fails in cloud environments (Render)
+    // Use standard Gmail SMTP with explicit STARTTLS (Port 587)
+    // Disabled pooling to prevent stale connection timeouts
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // Must be false for port 587
+        requireTLS: true,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
         },
-        family: 4, // Force IPv4
+        tls: {
+            rejectUnauthorized: false // Bypass strict certificate checks
+        },
         logger: true,
-        debug: true,
-        connectionTimeout: 30000,
-        greetingTimeout: 30000,
-        socketTimeout: 30000
+        debug: true
     });
 
     const message = {
