@@ -23,7 +23,7 @@ const ChatPage = () => {
         const fetchFriends = async () => {
             // ... existing friend fetch logic ...
             try {
-                const res = await axios.get('http://localhost:5000/api/users/friends', {
+                const res = await axios.get('/users/friends', {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
                 setFriends(res.data);

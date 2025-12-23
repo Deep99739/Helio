@@ -253,14 +253,19 @@ exports.acceptFriendRequest = async (req, res) => {
         await request.save();
 
         // Add to friends lists
+        // Add to friends lists (Check for duplicates)
         const sender = await User.findById(request.sender);
         const receiver = await User.findById(request.receiver);
 
-        sender.friends.push(receiver._id);
-        receiver.friends.push(sender._id);
+        if (!sender.friends.includes(receiver._id)) {
+            sender.friends.push(receiver._id);
+            await sender.save();
+        }
 
-        await sender.save();
-        await receiver.save();
+        if (!receiver.friends.includes(sender._id)) {
+            receiver.friends.push(sender._id);
+            await receiver.save();
+        }
 
         // Ideally delete the request or keep as history. 
         // User spec says: "delete the request".

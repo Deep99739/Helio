@@ -110,7 +110,11 @@ const ProfilePage = () => {
         setSocialHandles(newHandles);
     };
 
+    const [isSendingRequest, setIsSendingRequest] = useState(false);
+
     const handleSendRequest = async () => {
+        if (isSendingRequest) return;
+        setIsSendingRequest(true);
         try {
             if (!token) {
                 toast.error('You must be logged in');
@@ -137,6 +141,8 @@ const ProfilePage = () => {
             console.error(error);
             const msg = error.response?.data?.message || 'Request failed';
             toast.error(`Error ${error.response?.status}: ${msg}`);
+        } finally {
+            setIsSendingRequest(false);
         }
     };
 
@@ -374,8 +380,8 @@ const ProfilePage = () => {
                                     {!isOwner && (
                                         <>
                                             {friendshipStatus === 'NONE' && (
-                                                <button style={actionButtonStyle()} onClick={handleSendRequest}>
-                                                    Send Friend Request
+                                                <button style={actionButtonStyle(isSendingRequest)} onClick={handleSendRequest} disabled={isSendingRequest}>
+                                                    {isSendingRequest ? 'Sending...' : 'Send Friend Request'}
                                                 </button>
                                             )}
                                             {friendshipStatus === 'PENDING_SENT' && (

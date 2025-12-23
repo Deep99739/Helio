@@ -41,6 +41,7 @@ router.post("/", async (req, res) => {
         if (error.message === "Service Unavailable (Circuit Open)") {
             return res.status(503).json({ error: "Service busy, please try again later." });
         }
+        res.status(500).json({ error: "Failed to execute code. Check server logs." });
     }
 });
 
