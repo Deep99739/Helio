@@ -2,18 +2,22 @@ const nodemailer = require('nodemailer');
 const logger = require('./logger');
 
 const sendEmail = async (options) => {
-    // secure: true for 465, false for other ports
+    // Create transporter with connection pooling to manage connections more efficiently
     const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
+        service: 'gmail',
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
         },
-        connectionTimeout: 10000, // 10 seconds
-        logger: true,
-        debug: true
+        pool: true, // Use pooled connections
+        maxConnections: 1, // Limit distinct connections to avoid aggressive blocking
+        rateLimit: 5, // Limit messages per second
+        tls: {
+            rejectUnauthorized: false // Skip strict certificate validation
+        },
+        connectionTimeout: 20000,
+        greetingTimeout: 20000,
+        socketTimeout: 20000
     });
 
     const message = {
@@ -23,13 +27,28 @@ const sendEmail = async (options) => {
         html: options.html
     };
 
-    try {
-        const info = await transporter.sendMail(message);
-        logger.info(`Email sent: ${info.messageId}`);
-        return info;
-    } catch (error) {
-        logger.error(`Email send failed: ${error.message}`);
-        throw error;
+    // Retry Logic
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (attempts < maxAttempts) {
+        try {
+            const info = await transporter.sendMail(message);
+            logger.info(`Email sent: ${info.messageId}`);
+            return info;
+        } catch (error) {
+            attempts++;
+            logger.error(`Email send attempt ${attempts} failed: ${error.message}`);
+
+            if (attempts >= maxAttempts) {
+                // Return valuable feedback instead of just crashing
+                logger.error("All email retry attempts failed.");
+                throw error;
+            }
+
+            // Wait 2 seconds before retrying
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
     }
 };
 
