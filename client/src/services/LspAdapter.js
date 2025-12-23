@@ -20,9 +20,26 @@ export class LspAdapter {
 
     start(language) {
         if (this.isConnected) return;
+        this.language = language; // Store language
         this.socket.emit('lsp-start', { language });
         this.isConnected = true;
         this.sendInitialize();
+    }
+
+    // Helper to get extension
+    getFileExtension() {
+        switch (this.language) {
+            case 'python':
+            case 'python3': return 'py';
+            case 'cpp': return 'cpp';
+            case 'c': return 'c';
+            case 'java': return 'java';
+            case 'javascript':
+            case 'nodejs': return 'js';
+            case 'go': return 'go';
+            case 'rust': return 'rs';
+            default: return 'txt';
+        }
     }
 
     sendInitialize() {
@@ -33,13 +50,13 @@ export class LspAdapter {
             id: requestId,
             method: 'initialize',
             params: {
-                processId: null, // We are a proxy, so maybe null?
+                processId: null,
                 rootUri: null,
                 capabilities: {
                     textDocument: {
                         completion: {
                             completionItem: {
-                                snippetSupport: false // CM5 simple hints don't support snippets easily
+                                snippetSupport: false
                             }
                         }
                     }
@@ -80,10 +97,8 @@ export class LspAdapter {
         }
 
         const cursor = cm.getCursor();
-        const content = cm.getValue();
-
-        // Ensure changes are synced (we send didChange on every change event, but race conditions?)
-        // Assuming Editor `sendChange` handles it.
+        const ext = this.getFileExtension();
+        const uri = `file:///temp.${ext}`;
 
         const requestId = Date.now();
         const request = {
@@ -91,7 +106,7 @@ export class LspAdapter {
             id: requestId,
             method: 'textDocument/completion',
             params: {
-                textDocument: { uri: 'file:///temp.js' },
+                textDocument: { uri: uri },
                 position: { line: cursor.line, character: cursor.ch }
             }
         };
@@ -111,7 +126,6 @@ export class LspAdapter {
         this.socket.on('lsp-notification', responseHandler);
         this.socket.emit('lsp-input', request);
 
-        // 5s Timeout
         setTimeout(() => {
             this.socket.off('lsp-notification', responseHandler);
         }, 5000);
@@ -119,12 +133,13 @@ export class LspAdapter {
 
     sendChange(content) {
         if (!this.isInitialized) return;
+        const ext = this.getFileExtension();
 
         const notification = {
             jsonrpc: '2.0',
             method: 'textDocument/didChange',
             params: {
-                textDocument: { uri: 'file:///temp.js', version: 1 }, // TODO: Increment version
+                textDocument: { uri: `file:///temp.${ext}`, version: 1 },
                 contentChanges: [{ text: content }]
             }
         };
@@ -132,11 +147,17 @@ export class LspAdapter {
     }
 
     sendOpen(content) {
+        const ext = this.getFileExtension();
+        // Map language name to LSP languageId if needed (mostly same)
+        let langId = this.language;
+        if (langId === 'python3') langId = 'python';
+        if (langId === 'nodejs') langId = 'javascript';
+
         const notification = {
             jsonrpc: '2.0',
             method: 'textDocument/didOpen',
             params: {
-                textDocument: { uri: 'file:///temp.js', languageId: 'javascript', version: 1, text: content }
+                textDocument: { uri: `file:///temp.${ext}`, languageId: langId, version: 1, text: content }
             }
         };
         this.socket.emit('lsp-input', notification);
