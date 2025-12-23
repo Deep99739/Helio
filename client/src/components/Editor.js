@@ -84,16 +84,7 @@ function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage
         const { origin } = changes;
         const code = instance.getValue();
         onCodeChange(code);
-        if (origin !== "setValue") {
-          console.log(`[CLIENT OUT] Emitting code change to Room: ${roomId}`);
-          socketRef.current.emit(ACTIONS.CODE_CHANGE, {
-            roomId,
-            code,
-            fileId // Emit with File ID
-          });
-        } else {
-          console.log(`[CLIENT IGNORE] Change origin was ${origin}`);
-        }
+        // Legacy syncing removed in favor of Yjs
       });
     };
 
@@ -108,28 +99,10 @@ function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage
     }
   }, [selectedLanguage]);
 
-  // data receive from server
+  // Legacy CODE_CHANGE listener removed in favor of Yjs
   useEffect(() => {
-    const handleCodeChange = ({ code, fileId: incomingFileId }) => {
-      if (incomingFileId === fileId) {
-        console.log(`[CLIENT IN] Received code update. Length: ${code?.length}`);
-        if (code !== null && code !== undefined) {
-          const currentValue = editorRef.current.getValue();
-          if (currentValue !== code) {
-            console.log(`[CLIENT UPDATE] Applying change to Editor...`);
-            editorRef.current.setValue(code);
-          }
-        }
-      }
-    };
-
-    if (socketRef.current) {
-      socketRef.current.on(ACTIONS.CODE_CHANGE, handleCodeChange);
-    }
-    return () => {
-      socketRef.current?.off(ACTIONS.CODE_CHANGE, handleCodeChange);
-    };
-  }, [socketRef, fileId]);
+    // No-op or remove entirely
+  }, []);
 
   return (
     <div style={{ height: "100%" }}>

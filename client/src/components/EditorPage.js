@@ -221,10 +221,8 @@ const EditorPage = () => {
       });
 
 
-      socketRef.current.on(ACTIONS.CODE_CHANGE, ({ fileId, code }) => {
-        // Update files state so that if we switch tabs, we have the latest code
-        setFiles(prev => prev.map(f => f.id === fileId ? { ...f, content: code } : f));
-      });
+      // socketRef.current.on(ACTIONS.CODE_CHANGE, ...) - REMOVED: Yjs handles content sync now.
+      // Files state update is handled via onCodeChange prop in Editor component.
     };
     init();
 
