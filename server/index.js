@@ -1,4 +1,3 @@
-```javascript
 // Server Entry Point (Trigger Restart)
 const express = require("express");
 const app = express();
@@ -9,9 +8,9 @@ const path = require('path');
 const logger = require('./src/utils/logger');
 let passport;
 try {
-   passport = require('./src/config/passport');
+  passport = require('./src/config/passport');
 } catch (e) {
-   console.error("Passport config missing", e);
+  console.error("Passport config missing", e);
 }
 const cors = require("cors");
 const axios = require("axios");
@@ -149,4 +148,4 @@ app.post("/compile", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server is runnint on port ${ PORT } `));
+server.listen(PORT, () => console.log(`Server is runnint on port ${PORT} `));
