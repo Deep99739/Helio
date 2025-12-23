@@ -4,6 +4,8 @@ const RoomService = require('./RoomService');
 const CollaborationService = require('./CollaborationService');
 const logger = require('../utils/logger');
 
+const LspService = require('./LspService');
+
 class SocketService {
     constructor() {
         this.io = null;
@@ -27,6 +29,13 @@ class SocketService {
 
         // Yjs Sync
         socket.on('sync-update', (data) => this.handleSyncUpdate(socket, data));
+
+        // LSP Events
+        socket.on('lsp-start', ({ language }) => {
+            console.log(`[SOCKET] Received lsp-start for ${language}`);
+            LspService.startSession(socket, language);
+        });
+        socket.on('lsp-input', (data) => LspService.handleClientMessage(socket, data));
 
         // File Events
         socket.on(ACTIONS.FILE_CREATED, (data) => this.handleFileCreated(socket, data));

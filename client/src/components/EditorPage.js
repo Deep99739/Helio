@@ -70,6 +70,11 @@ const EditorPage = () => {
   const [fileIdToRename, setFileIdToRename] = useState(null);
   const [renameValue, setRenameValue] = useState("");
 
+  // Autocomplete State
+  const [isAutocompleteEnabled, setIsAutocompleteEnabled] = useState(true);
+
+
+
   const handleRenameSubmit = (fileId) => {
     if (!renameValue.trim()) return setFileIdToRename(null);
     setFiles(prev => prev.map(f => f.id === fileId ? { ...f, name: renameValue } : f));
@@ -701,6 +706,23 @@ const EditorPage = () => {
           >
             {isRightOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
           </button>
+
+          {/* Autocomplete Toggle */}
+          <button
+            onClick={() => setIsAutocompleteEnabled(!isAutocompleteEnabled)}
+            style={{
+              ...iconButtonStyle,
+              color: isAutocompleteEnabled ? '#4ade80' : '#666',
+              display: 'flex',
+              gap: '6px',
+              width: 'auto',
+              fontSize: '11px',
+              fontWeight: '600'
+            }}
+            title="Toggle Autocomplete"
+          >
+            AI {isAutocompleteEnabled ? 'ON' : 'OFF'}
+          </button>
         </div>
       </div >
 
@@ -1019,6 +1041,7 @@ const EditorPage = () => {
                     updateFileContent(code);
                   }}
                   onEditorMount={onEditorMountCallback}
+                  isAutocompleteEnabled={isAutocompleteEnabled}
                 />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-secondary)' }}>

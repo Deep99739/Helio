@@ -23,7 +23,11 @@ class RoomService {
         const room = await Room.findOne({ roomId });
         if (!room) {
             // Create room on fly if needed
-            const newRoom = new Room({ roomId, files: [file] });
+            const newRoom = new Room({
+                roomId,
+                files: [file],
+                name: 'Untitled Room' // Default name to satisfy required field
+            });
             await newRoom.save();
             return;
         }
@@ -34,6 +38,12 @@ class RoomService {
         } else {
             room.files.push(file);
         }
+
+        // Legacy data fix: Ensure name exists
+        if (!room.name) {
+            room.name = 'Untitled Room';
+        }
+
         await room.save();
     }
 
