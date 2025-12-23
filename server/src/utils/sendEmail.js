@@ -1,54 +1,24 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const logger = require('./logger');
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const sendEmail = async (options) => {
-    // Use standard Gmail SMTP with explicit STARTTLS (Port 587)
-    // Disabled pooling to prevent stale connection timeouts
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // Must be false for port 587
-        requireTLS: true,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        },
-        tls: {
-            rejectUnauthorized: false // Bypass strict certificate checks
-        },
-        logger: true,
-        debug: true
-    });
+    const { to, subject, html } = options;
 
-    const message = {
-        from: `Helio App <${process.env.EMAIL_USER}>`,
-        to: options.to,
-        subject: options.subject,
-        html: options.html
-    };
+    try {
+        const data = await resend.emails.send({
+            from: 'onboarding@resend.dev', // Default for free tier. Verify domain to use custom.
+            to: to,
+            subject: subject,
+            html: html
+        });
 
-    // Retry Logic
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (attempts < maxAttempts) {
-        try {
-            const info = await transporter.sendMail(message);
-            logger.info(`Email sent: ${info.messageId}`);
-            return info;
-        } catch (error) {
-            attempts++;
-            logger.error(`Email send attempt ${attempts} failed: ${error.message}`);
-
-            if (attempts >= maxAttempts) {
-                // Return valuable feedback instead of just crashing
-                logger.error("All email retry attempts failed.");
-                throw error;
-            }
-
-            // Wait 2 seconds before retrying
-            await new Promise(resolve => setTimeout(resolve, 2000));
-        }
+        logger.info(`Email sent successfully: ${data.id}`);
+        return data;
+    } catch (error) {
+        logger.error(`Resend Email Error: ${error.message}`);
+        throw error;
     }
 };
 
