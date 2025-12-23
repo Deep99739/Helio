@@ -19,12 +19,31 @@ export const AuthProvider = ({ children }) => {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
 
+    const fetchUser = async (currentToken) => {
+        try {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${currentToken}`;
+            const res = await axios.get('/auth/me');
+            setUser(res.data);
+            localStorage.setItem('user', JSON.stringify(res.data));
+        } catch (error) {
+            console.log("Failed to fetch user profile", error);
+            logout();
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser && token) {
             setUser(JSON.parse(storedUser));
+            setLoading(false);
+        } else if (token) {
+            // Token exists but no user (e.g. Social Login), fetch profile
+            fetchUser(token);
+        } else {
+            setLoading(false);
         }
-        setLoading(false);
     }, [token]);
 
     // Axios interceptor to handle 401s globally

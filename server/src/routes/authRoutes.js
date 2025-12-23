@@ -44,5 +44,7 @@ router.post('/login', authController.login);
 router.post('/send-otp', authController.sendOTP);
 router.post('/verify-otp', authController.verifyOTP);
 router.post('/reset-password', authController.resetPassword);
-
+// Need middleware to protect this route
+const auth = require('../middleware/auth'); // Assuming this exists or we need to check index/routes for location
+router.get('/me', auth, authController.getMe);
 module.exports = router;

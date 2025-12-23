@@ -195,6 +195,19 @@ exports.resetPassword = async (req, res) => {
         res.status(200).json({ message: 'Password Reset Successfully. Please Login.' });
     } catch (err) {
         console.error("Reset Error:", err);
-        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Get current logged in user
+// @route   GET /api/auth/me
+exports.getMe = async (req, res) => {
+    try {
+        // req.user is set by auth middleware
+        // We need to ensure 'auth' middleware is used on this route
+        const user = await User.findById(req.user.user.id).select('-password'); // user.id comes from jwt payload
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
     }
 };
