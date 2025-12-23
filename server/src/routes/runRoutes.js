@@ -11,7 +11,7 @@ const executeCode = async (config) => {
 
 const breaker = new CircuitBreaker(executeCode, { failureThreshold: 3, resetTimeout: 10000 });
 
-router.post("/run", async (req, res) => {
+router.post("/", async (req, res) => {
     const { code, language, input } = req.body;
 
     // ... constructs config ...
