@@ -26,8 +26,11 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data);
             localStorage.setItem('user', JSON.stringify(res.data));
         } catch (error) {
-            console.log("Failed to fetch user profile", error);
-            logout();
+            console.error("Failed to fetch user profile", error);
+            // Only logout if unauthorized. Network errors shouldn't log you out.
+            if (error.response && error.response.status === 401) {
+                logout();
+            }
         } finally {
             setLoading(false);
         }
