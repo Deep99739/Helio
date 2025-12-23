@@ -1,8 +1,18 @@
+```javascript
+// Server Entry Point (Trigger Restart)
 const express = require("express");
 const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
 const ACTIONS = require("./src/constants/Actions");
+const path = require('path');
+const logger = require('./src/utils/logger');
+let passport;
+try {
+   passport = require('./src/config/passport');
+} catch (e) {
+   console.error("Passport config missing", e);
+}
 const cors = require("cors");
 const axios = require("axios");
 const server = http.createServer(app);
@@ -57,6 +67,30 @@ app.use(express.json());
 
 // Routes
 // road map here mainak
+// Security Middleware
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
+// Helmet for Secure Headers
+app.use(helmet());
+
+// Rate Limiting: Global
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(globalLimiter);
+
+// Rate Limiting: Auth Routes (Stricter)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 login/register attempts per window
+  message: "Too many login attempts, please try again after 15 minutes",
+});
+app.use("/api/auth", authLimiter);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", require("./src/routes/userRoutes"));
 app.use("/api/chat", require("./src/routes/chatRoutes"));
@@ -115,4 +149,4 @@ app.post("/compile", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server is runnint on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server is runnint on port ${ PORT } `));

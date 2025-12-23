@@ -80,10 +80,42 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem('user'); // Keep this line from original logout
         setToken(null);
         setUser(null);
-        delete axios.defaults.headers.common['Authorization'];
-        navigate('/login');
+        delete axios.defaults.headers.common['Authorization']; // Keep this line from original logout
+        navigate('/login'); // Keep this line from original logout
+        toast.success('Logged out successfully'); // Added from the provided edit
+    };
+
+    // Verify OTP
+    const verifyOtp = async (email, otp) => {
+        try {
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/verify-otp`, { email, otp });
+            return true;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    // Send OTP
+    const sendOtp = async (email) => {
+        try {
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/send-otp`, { email });
+            return true;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    // Reset Password
+    const resetPassword = async (email, otp, newPassword) => {
+        try {
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/reset-password`, { email, otp, newPassword });
+            return true;
+        } catch (error) {
+            throw error;
+        }
     };
 
     const value = {
@@ -92,7 +124,10 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        loading
+        loading,
+        sendOtp,
+        verifyOtp,
+        resetPassword
     };
 
     return (

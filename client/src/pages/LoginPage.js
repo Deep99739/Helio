@@ -46,6 +46,31 @@ const LoginPage = () => {
                         <p className="auth-subtitle">Enter your credentials to access your workspace.</p>
                     </div>
 
+                    {/* SOCIAL LOGIN */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <a
+                            href={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/api/auth/google`}
+                            className="auth-btn"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                background: '#fff',
+                                color: '#333',
+                                textDecoration: 'none'
+                            }}
+                        >
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '20px', height: '20px' }} />
+                            Sign in with Google
+                        </a>
+                        <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0', color: 'var(--text-secondary)' }}>
+                            <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }}></div>
+                            <span style={{ padding: '0 10px', fontSize: '0.9rem' }}>OR</span>
+                            <div style={{ flex: 1, height: '1px', background: 'var(--glass-border)' }}></div>
+                        </div>
+                    </div>
+
                     <form onSubmit={handleLogin}>
                         <div className="auth-form-group">
                             <label className="auth-label">Email Address</label>
@@ -62,8 +87,13 @@ const LoginPage = () => {
                         </div>
 
                         <div className="auth-form-group">
-                            <label className="auth-label">Password</label>
-                            <div className="auth-input-wrapper">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <label className="auth-label" style={{ marginBottom: 0 }}>Password</label>
+                                <Link to="/forgot-password" style={{ color: 'var(--accent-blue)', fontSize: '0.8rem', textDecoration: 'none' }}>
+                                    Forgot Password?
+                                </Link>
+                            </div>
+                            <div className="auth-input-wrapper" style={{ marginTop: '0.5rem' }}>
                                 <input
                                     type="password"
                                     className="auth-input"

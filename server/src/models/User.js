@@ -41,7 +41,22 @@ const userSchema = new mongoose.Schema({
     recentRooms: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room'
-    }]
+    }],
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    otp: {
+        type: String
+    },
+    otpExpires: {
+        type: Date
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true
+    }
 }, {
     timestamps: true,
     toJSON: { flattenMaps: true },
