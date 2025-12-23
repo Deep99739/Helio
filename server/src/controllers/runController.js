@@ -1,7 +1,4 @@
-// runController.js
-// using curl via child_process to bypass Node network issues
-
-const { spawn } = require('child_process');
+const axios = require('axios');
 const logsController = require('./logsController');
 
 exports.runCode = async (req, res) => {
@@ -11,14 +8,13 @@ exports.runCode = async (req, res) => {
         return res.status(400).json({ error: "Code is required" });
     }
 
-    // ... languageMap ...
-
     const languageMap = {
         "python3": "python",
         "c": "c",
         "cpp": "cpp",
         "java": "java",
         "nodejs": "javascript",
+        "javascript": "javascript",
         "ruby": "ruby",
         "go": "go",
         "scala": "scala",
@@ -34,65 +30,36 @@ exports.runCode = async (req, res) => {
 
     const pistonLanguage = languageMap[language] || language;
 
-    // Log the execution if roomId and username are present
+    // Log the execution
     if (roomId && username) {
+        // Run async, don't await logging to speed up response
         logsController.createLog({
             roomId,
             user: username,
             action: 'CODE_RUN',
             codeSnapshot: code
-        });
+        }).catch(err => console.error("Logging failed", err));
     }
 
-    const requestBody = JSON.stringify({
-        language: pistonLanguage,
-        version: "*",
-        files: [{ content: code }],
-        stdin: input || ""
-    });
+    try {
+        const response = await axios.post('https://emkc.org/api/v2/piston/execute', {
+            language: pistonLanguage,
+            version: "*",
+            files: [{ content: code }],
+            stdin: input || ""
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-    const curl = spawn('curl', [
-        '-X', 'POST',
-        'https://emkc.org/api/v2/piston/execute',
-        '-H', 'Content-Type: application/json',
-        '-d', '@-', // Read from stdin
-        '-s' // Silent mode (don't show progress meter)
-    ]);
-
-    let outputData = '';
-    let errorData = '';
-
-    curl.stdout.on('data', (data) => {
-        outputData += data;
-    });
-
-    curl.stderr.on('data', (data) => {
-        errorData += data;
-    });
-
-    curl.on('close', (code) => {
-        if (code !== 0) {
-            console.error("Curl failed with code:", code);
-            console.error("Curl stderr:", errorData);
-            return res.status(500).json({ error: "Failed to execute code", details: "Execution engine connection error" });
+        res.json(response.data);
+    } catch (error) {
+        console.error("Code Execution Failed:", error.message);
+        if (error.response) {
+            console.error("Piston Response Data:", error.response.data);
+            return res.status(error.response.status).json(error.response.data);
         }
-
-        try {
-            const responseJson = JSON.parse(outputData);
-            res.json(responseJson);
-        } catch (e) {
-            console.error("Failed to parse Piston response:", e);
-            console.error("Raw Output:", outputData);
-            res.status(500).json({ error: "Invalid response from execution engine" });
-        }
-    });
-
-    curl.on('error', (err) => {
-        console.error("Failed to spawn curl:", err);
-        res.status(500).json({ error: "Internal server error" });
-    });
-
-    // Write body to stdin and end
-    curl.stdin.write(requestBody);
-    curl.stdin.end();
+        res.status(500).json({ error: "Failed to execute code", details: error.message });
+    }
 };
