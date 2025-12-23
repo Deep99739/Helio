@@ -42,6 +42,7 @@ exports.runCode = async (req, res) => {
     }
 
     try {
+        console.log(`Sending request to Piston: ${pistonLanguage}`);
         const response = await axios.post('https://emkc.org/api/v2/piston/execute', {
             language: pistonLanguage,
             version: "*",
@@ -53,12 +54,18 @@ exports.runCode = async (req, res) => {
             }
         });
 
+        console.log("Piston response received");
         res.json(response.data);
     } catch (error) {
         console.error("Code Execution Failed:", error.message);
         if (error.response) {
-            console.error("Piston Response Data:", error.response.data);
+            console.error("Piston Error Status:", error.response.status);
+            console.error("Piston Error Data:", JSON.stringify(error.response.data));
             return res.status(error.response.status).json(error.response.data);
+        } else if (error.request) {
+            console.error("Piston No Response:", error.request);
+        } else {
+            console.error("Axios Setup Error:", error.message);
         }
         res.status(500).json({ error: "Failed to execute code", details: error.message });
     }
