@@ -13,11 +13,16 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            await login(email, password);
-            toast.success('Logged in successfully!');
-            navigate('/dashboard');
+            const result = await login(email.trim(), password);
+            if (result.success) {
+                toast.success('Logged in successfully!');
+                navigate('/dashboard');
+            } else {
+                toast.error(result.error);
+            }
         } catch (err) {
-            toast.error(err.response?.data?.msg || 'Login failed');
+            console.error(err);
+            toast.error('An unexpected error occurred');
         }
     };
 
