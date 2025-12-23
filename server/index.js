@@ -1,5 +1,6 @@
 // Server Entry Point (Trigger Restart)
 const express = require("express");
+require("dotenv").config();
 const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
@@ -17,7 +18,6 @@ const axios = require("axios");
 const server = http.createServer(app);
 const mongoose = require("mongoose");
 const authRoutes = require("./src/routes/authRoutes");
-require("dotenv").config();
 
 // deepak say secret here if env broken
 process.env.JWT_SECRET = process.env.JWT_SECRET;
