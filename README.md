@@ -1,140 +1,208 @@
-# Helio: Real-time Distributed Collaborative Development Platform
+# Helio: Real-Time Collaborative Development Platform
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Status](https://img.shields.io/badge/status-Production_Ready-success.svg)
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)
 ![React](https://img.shields.io/badge/React-v18-blue.svg)
 
-> **"Build Better, Together."**
+> **"Code Together, Build Faster."**
 >
-> A robust, fault-tolerant, and secure collaborative coding environment designed for real-time engineering. Powered by CRDTs for mathematically proven conflict-free editing and an atomic design system.
-
----
-## 💎 Core Functionalities
-
-Helio provides a comprehensive suite of features for seamless collaboration:
-
-### 1. 🚀 Immediate & Anonymous Collaboration
-*   **Instant Room Generation**: Users can generate a unique room ID directly from the landing page.
-*   **Zero-Friction Access**: Collaborators can join via URL or Room ID instantly as anonymous guests.
-
-### 2. 🔐 User Dashboard & History
-*   **Secure Authentication**: Users can sign up/login to access a personalized dashboard.
-*   **Room Persistence**: All rooms created by logged-in users are **automatically saved to MongoDB**.
-*   **History Access**: Users can revisit any previous coding session; the state is preserved exactly as left.
-
-### 3. 💬 Communication Suite
-*   **Real-time Chat**: In-room chat for discussing logic without context switching.
-*   **Social Graph**:
-    *   **Friend Requests**: Connect with other developers.
-    *   **Private Chat**: Direct messaging system for out-of-band communication.
-
-### 4. 🎨 Interactive Whiteboard
-*   **Infinite Canvas**: A shared vector-based canvas for architecture diagrams.
-*   **Real-time Sync**: Strokes are synchronized instantly using a custom broadcast protocol.
-*   **Shape Correction**: Utilizes `perfect-freehand` algorithm for beautifying strokes.
-
-### 5. 💻 Professional Editor
-*   **Multi-language Support**: C++, Python, Java, JavaScript, and 10+ others.
-*   **Live Presence**: Remote cursors and selection highlights for all active users.
-*   **Cloud Compilation**: Execute code remotely via JDoodle API integration.
+> Helio is a robust, distributed collaborative code editor designed for real-time engineering teams. It allows developers from across the globe to write, debug, and execute code in a shared environment with **zero latency** and **mathematically proven data consistency**.
 
 ---
 
-## 🚀 Engineering Highlights
+## 💎 Core Features
 
-Detailed implementation of **Data Structures, Algorithms, and Design Patterns** to solve complex real-time synchronization challenges.
+### 1. 🚀 Real-Time Collaboration (CRDTs)
+*   **Conflict-Free Editing**: Powered by **Yjs** and **CRDTs (Conflict-Free Replicated Data Types)**, ensuring that multiple users can type simultaneously without ever overwriting each other's work.
+*   **Live Presence**: See exactly where your team members are working with color-coded remote cursors and selection highlights.
 
-*   **Conflict-Free Replicated Data Types (CRDTs)**:
-    *   Implemented `Yjs` to manage distributed state across clients, ensuring strong eventual consistency without a central authority for conflict resolution.
-    *   Solves the "concurrent edit" problem (Split-Brain) using vector clocks and deletion tombstones.
-*   **Fault-Tolerant Architecture**:
-    *   **Circuit Breaker Pattern**: Custom implementation (`utils/CircuitBreaker.js`) to prevent cascading failures during third-party API outages (e.g., Code Compilation Service).
-    *   **Resilient Socket Handling**: Robust logic to handle "Offline-Online" transitions, ensuring no code edits are lost during momentary network drops.
-*   **Real-time Event-Driven Communication**:
-    *   Built on `Socket.io` (WebSocket) for low-latency, bidirectional events (`JOIN`, `SYNC_CODE`, `ELEMENT-UPDATE`).
+### 2. 🔐 Enterprise-Grade Authentication
+*   **Dual-Login System**: Sign in using either your **Email** or a custom **Username**.
+*   **Secure Registration**: Multi-step flow with **Email Verification (OTP)** via Brevo.
+*   **Session Management**: Stateless authentication using **JWT (JSON Web Tokens)** with secure HTTP headers.
+*   **Password Security**: Industry-standard **Bcrypt** hashing strategies.
 
-*   **Atomic Design System**:
-    *   Component-driven UI architecture (`Atomic Design`) using Design Tokens (`tokens.css`) and reusable atoms (`Button`, `Input`, `GlassPane`).
+### 3. ⚡ Code Execution Engine
+*   **Multi-Language Support**: Run C++, Python, Java, JavaScript, and more directly in the browser.
+*   **Sandboxed Environment**: Powered by the **Piston API** for secure, isolated code execution.
+*   **Unlimited Scale**: No rate limits or local binaries required on the host server.
 
+### 4. 🎨 Smart UI & Whiteboard
+*   **Integrated Whiteboard**: A shared infinite canvas for system design diagrams (Architecture, Flowcharts).
+*   **Atomic Design System**: A custom-built UI library using glassmorphism and semantic CSS variables.
 
 ---
 
-## 🏗 System Architecture
+## 🏗 System Architecture (Detailed)
 
-### Monolithic Client-Server Architecture
-Helio is built as a robust monolith to minimize complexity while maximizing data integrity.
+This diagram represents the complete data flow of the Helio platform, including Authentication, Real-time Sync, and External Service Integrations.
 
 ```mermaid
 graph TD
-    subgraph Client Application
-        UI["React UI (Atomic Design)"]
-        Yjs["Yjs CRDT Provider"]
-        Circuit["Client Logic"]
+    %% Subgraph Styling
+    classDef client fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef server fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
+    classDef db fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px;
+    classDef external fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+
+    subgraph Client ["🖥️ Client Application (React 18)"]
+        direction TB
+        UI[Atomic UI Components]
+        AuthUI[Login/Register Forms]
+        
+        subgraph EditorEngine [Code Editor]
+            CM[CodeMirror 5 Instance]
+            YjsClient[Yjs CRDT Provider]
+            SocketClient[Socket.io Client]
+        end
     end
 
-    subgraph Backend Server
-        API["Express REST API"]
-        Socket["Socket.io Service"]
-        CB["Circuit Breaker Middleware"]
+    subgraph LB ["☁️ Load Balancer / CDN"]
+        RenderLB[Render/Vercel Edge Network]
     end
 
-    subgraph Data Layer
+    subgraph Server ["⚙️ Backend Server (Node.js + Express)"]
+        direction TB
+        
+        API[REST API Router]
+        SocketSrv[Socket.io Service]
+        
+        subgraph AuthLayer [Security Layer]
+            AuthCtrl[Auth Controller]
+            JWT[JWT Middleware]
+            Bcrypt[Bcrypt Hashing]
+            Rate[Rate Limiter]
+        end
+
+        subgraph Services [Business Logic]
+            RoomSrv[Room Service]
+            ExecSrv[Run Controller (Axios)]
+        end
+    end
+
+    subgraph Database ["💾 Persistence Layer"]
         Mongo[("MongoDB Atlas")]
     end
 
-    UI <-->|WebSocket Events| Socket
-    Circuit -->|REST Requests| API
-    API -->|Mongoose ODM| Mongo
-    Socket -->|Persistence| Mongo
-    CB --Wraps External Calls--> API
-```
+    subgraph External ["🌍 External APIs"]
+        Brevo[("📧 Brevo (Email/OTP)")]
+        Piston[("⚡ Piston (Code Runner)")]
+    end
 
-### Collaborative Sync Protocol
-1.  **Local Mutation**: User types a character; `Yjs` creates a differential update.
-2.  **Propagation**: The update is emitted via `socket.io` to the server.
-3.  **Broadcast**: Server relays the update to all other clients in the `roomId`.
-4.  **Convergence**: Choosing CRDTs ensures that all clients eventually reach the exact same state, regardless of the order of arrival of packets.
-5.  **Persistence**: The state is effectively serialized and stored in MongoDB for future retrieval.
+    %% Connections
+    UI --> AuthUI
+    UI --> EditorEngine
+
+    %% Network Flow
+    AuthUI --HTTPS--> RenderLB
+    SocketClient --WSS (WebSockets)--> RenderLB
+    RenderLB --> API
+    RenderLB --> SocketSrv
+
+    %% Backend Flow
+    API --> AuthLayer
+    AuthLayer --> AuthCtrl
+    AuthCtrl --> Bcrypt
+    AuthCtrl --> JWT
+    AuthCtrl --Send OTP--> Brevo
+
+    %% Collaboration Flow
+    SocketSrv --Sync Updates--> RoomSrv
+    SocketSrv --Broadcast--> SocketClient
+    RoomSrv --Persist State--> Mongo
+    
+    %% Auth Persistence
+    AuthCtrl --Store User--> Mongo
+
+    %% Execution Flow
+    EditorEngine --Run Code--> API
+    API --> ExecSrv
+    ExecSrv --POST Source Code--> Piston
+    Piston --Return Output--> ExecSrv
+    ExecSrv --JSON Response--> EditorEngine
+
+    %% Styling Application
+    class UI,AuthUI,EditorEngine client;
+    class API,SocketSrv,AuthLayer,Services server;
+    class Mongo db;
+    class Brevo,Piston external;
+```
 
 ---
 
 ## 🛠 Tech Stack
 
-### Frontend (Client)
-*   **Core**: React 18, JavaScript (ES6+).
-*   **State**: Redux Toolkit (Global UI), Yjs (Distributed Doc).
-*   **Styling**: Vanilla CSS Variables (Tokens), Glassmorphism.
-*   **Editor**: CodeMirror 5 (Custom Bindings).
-*   **Whiteboard**: Rough.js, Perfect-Freehand.
-
-### Backend (Server)
-*   **Runtime**: Node.js.
-*   **Framework**: Express.js.
-*   **Real-time**: Socket.io.
-*   **Database**: MongoDB (Atlas) + Mongoose.
-*   **Resilience**: Custom Circuit Breaker implementation.
-
----
-
-## 🧩 Algorithms & Data Structures Used
-
-*   **Conflict-Free Replicated Data Types (CRDTs)**:
-    *   Uses a **Doubly Linked List** of item structs ($ID_client$, $Clock_{local}$) to manage insertions/deletions.
-    *   Guarantees convergence (Commutativity) for concurrent operations.
-*   **Circuit Breaker State Machine**:
-    *   States: `CLOSED` $\to$ `OPEN` $\to$ `HALF-OPEN`.
-    *   Prevents system resource exhaustion during external API failures.
-*   **Deboucing**:
-    *   Applied to network-heavy operations (like saving to DB) to optimize throughput.
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend** | React 18 | Declarative UI Library |
+| | CodeMirror 5 | Text Editor Component |
+| | Socket.io-Client | Real-time WebSocket Communication |
+| | Axios | HTTP Requests |
+| **Backend** | Node.js & Express | Server Runtime & API Framework |
+| | Socket.io | Event-based Bidirectional Communication |
+| | Mongoose | MongoDB Object Modeling |
+| **Security** | JSON Web Token (JWT) | Stateless Authentication |
+| | Bcrypt.js | Password Hashing |
+| | Helmet & Rate-Limit | API Security Hardening |
+| **External** | Piston API | Remote Code Execution Sandbox |
+| | Brevo (formerly Sendinblue) | Transactional Email Service (OTP) |
 
 ---
 
-## 👨‍💻 Getting Started
+## 🧩 Key Algorithms
 
-1.  **Clone**: `git clone https://github.com/Deep99739/Helio.git`
-2.  **Install**: `npm install` (root, client, server)
-3.  **Env**: Configure `MONGO_URI`, `PORT`, `JWT_SECRET`.
-4.  **Run**: `npm run dev`
+### 1. Conflict-Free Replicated Data Types (CRDTs)
+To solve the "Split-Brain" problem in distributed systems (where two users edit the same line offline), we use Yjs.
+*   **Vector Clocks**: Tracks the 'time' of edits relative to each client.
+*   **Differential Synchronization**: Only sends small binary updates (deltas) over the wire, not the whole file.
+
+### 2. Exponential Backoff (Resilience)
+Custom retry logic is implemented for the Piston API calls. If the sandbox is busy, the system waits `2^n` ms before retrying, preventing server overload.
 
 ---
+
+## 👨‍💻 Getting Started (Local Development)
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/Deep99739/Helio.git
+    cd Helio
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    # Root (Concurrent Runner)
+    npm install
+    
+    # Client
+    cd client && npm install
+    
+    # Server
+    cd ../server && npm install
+    ```
+
+3.  **Environment Configuration**
+    Create a `.env` file in `server/`:
+    ```env
+    PORT=5000
+    MONGO_URI=your_mongodb_atlas_uri
+    JWT_SECRET=your_super_secret_key
+    BREVO_API_KEY=your_email_api_key
+    ```
+    Create a `.env` file in `client/`:
+    ```env
+    REACT_APP_BACKEND_URL=http://localhost:5000
+    ```
+
+4.  **Run the App**
+    ```bash
+    # Runs both Client and Server concurrently
+    npm start
+    ```
+
+Open `http://localhost:3000` to start coding!
+
+---
+
+*Built with ❤️ by Deepak & Mainak*
