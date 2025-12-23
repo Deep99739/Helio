@@ -21,7 +21,6 @@ import "codemirror/mode/rust/rust";
 import "codemirror/mode/r/r";
 
 import { ACTIONS } from "../config/Actions";
-import { LspAdapter } from "../services/LspAdapter";
 import "codemirror/addon/hint/show-hint";
 import "codemirror/addon/hint/show-hint.css";
 
@@ -55,10 +54,6 @@ function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage
   const autocompleteRef = useRef(isAutocompleteEnabled);
 
   useEffect(() => {
-    autocompleteRef.current = isAutocompleteEnabled;
-  }, [isAutocompleteEnabled]);
-
-  useEffect(() => {
     const init = async () => {
       const editor = CodeMirror.fromTextArea(
         document.getElementById("realtimeEditor"),
@@ -72,9 +67,6 @@ function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage
           extraKeys: {
             "Ctrl-Space": "autocomplete",
             "Tab": (cm) => {
-              // Try to pick completion if widget is active? 
-              // Actually relying on hintOptions below is safer for the widget state.
-              // If not active, do indent.
               if (cm.state.completionActive) {
                 cm.state.completionActive.pick();
               } else {
@@ -93,34 +85,6 @@ function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage
         }
       );
       editorRef.current = editor;
-
-      // Initialize LSP Adapter
-      if (socketRef.current) {
-        const lsp = new LspAdapter(socketRef.current, editor);
-        lspAdapterRef.current = lsp;
-
-        // Connect hint function
-        const hintFn = (cm, callback, options) => {
-          if (lspAdapterRef.current && autocompleteRef.current) {
-            lspAdapterRef.current.getHints(cm, callback, options);
-          } else {
-            // Ensure we call callback even if disabled, to finish the async request cleanly
-            if (callback) callback({ list: [], from: cm.getCursor(), to: cm.getCursor() });
-          }
-        };
-        hintFn.async = true; // Explicitly flag function as async
-
-        editor.setOption("hintOptions", {
-          hint: hintFn,
-          async: true, // Keep this too
-          completeSingle: false,
-          extraKeys: {
-            "Tab": (cm, handle) => {
-              handle.pick();
-            }
-          }
-        });
-      }
 
       // New Standard Prop
       if (onEditorMount) {
@@ -143,32 +107,11 @@ function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage
         const { origin } = changes;
         const code = instance.getValue();
         onCodeChange(code);
-
-        // Notify LSP of changes
-        if (lspAdapterRef.current) {
-          lspAdapterRef.current.sendChange(code);
-        }
-
-        // Trigger Autocomplete on type if enabled
-        if (origin !== "setValue" && origin !== "complete" && autocompleteRef.current) {
-          // Simple naive trigger: if user types a char
-          const firstChar = changes.text[0];
-          if (firstChar && (firstChar === "." || firstChar.match(/[a-zA-Z]/))) {
-            instance.showHint({ completeSingle: false });
-          }
-        }
       });
     };
 
     init();
   }, []); // Run once
-
-  // Update Language in LSP
-  useEffect(() => {
-    if (lspAdapterRef.current && selectedLanguage) {
-      lspAdapterRef.current.start(selectedLanguage);
-    }
-  }, [selectedLanguage]);
 
   // Update Language Mode dynamically
   useEffect(() => {
