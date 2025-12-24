@@ -2,7 +2,7 @@
 /* Single source of truth for all styling */
 
 :root {
-    /* --- PALETTE: Dark Modern Precision --- */
+    /* --- PALETTE: Dark Modern Precision (DEFAULT) --- */
     --bg-darker: #0d1117;
     --bg-dark: #161b22;
     --bg-panel: #21262d;
@@ -20,6 +20,8 @@
     --gradient-space: linear-gradient(135deg, #0b0c15 0%, #1a1d2d 100%);
     --gradient-accent: linear-gradient(90deg, #007acc 0%, #00d2ff 100%);
     --gradient-subtle: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+    --gradient-hero: linear-gradient(90deg, #ffffff 0%, #aaaaaa 100%);
+    /* Default Dark Mode Hero Text */
 
     /* --- TYPOGRAPHY --- */
     --text-primary: #f0f6fc;
@@ -48,4 +50,47 @@
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
     --shadow-glow: 0 0 20px rgba(56, 189, 248, 0.2);
+}
+
+/* --- LIGHT THEME OVERRIDES (High Contrast) --- */
+/* --- LIGHT THEME OVERRIDES (High Contrast) --- */
+:root[data-theme='light'] {
+    /* Backgrounds */
+    --bg-darker: #f3f4f6;
+    /* Light Gray App Background (Tailwind Gray-100) */
+    --bg-dark: #ffffff;
+    /* White for Main Editor/Sidebar */
+    --bg-panel: #ffffff;
+    /* White for Panels/Cards */
+
+    /* Text */
+    --text-primary: #111827;
+    /* Gray-900 (Near Black) for high contrast */
+    --text-secondary: #4b5563;
+    /* Gray-600 */
+    --text-tertiary: #9ca3af;
+    /* Gray-400 */
+
+    /* Borders - Critical for definition on white */
+    --border-subtle: #e5e7eb;
+    /* Gray-200 */
+    --border-active: #d1d5db;
+    /* Gray-300 */
+
+    /* Glassmorphism - Adjusted for Light Mode */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    /* More opaque white */
+    --glass-border: rgba(0, 0, 0, 0.06);
+
+    /* Gradients */
+    --gradient-space: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+    --gradient-subtle: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0) 100%);
+    --gradient-hero: linear-gradient(90deg, #111827 0%, #4b5563 100%);
+    /* Dark Gradient for Hero Text in Light Mode */
+
+    /* Shadows - Softer but visible */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
+    --shadow-glow: 0 0 20px rgba(56, 189, 248, 0.4);
 }

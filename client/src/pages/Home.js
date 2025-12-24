@@ -43,8 +43,8 @@ const Home = () => {
     return (
         <div style={{
             minHeight: '100vh',
-            color: 'var(--text-primary)',
-            backgroundColor: '#000', // Deep black base
+            color: '#f0f6fc', // Always light text
+            backgroundColor: '#000', // Deep black base (Ignored by Theme)
             display: 'flex',
             flexDirection: 'column',
             fontFamily: 'var(--font-ui)',

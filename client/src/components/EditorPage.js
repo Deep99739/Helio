@@ -13,7 +13,8 @@ import { toast } from "react-hot-toast";
 import axios from "axios";
 import Chat from "./Chat";
 import { useAuth } from "../context/AuthContext";
-import { Play, RotateCcw, Copy, LogOut, ChevronDown, ChevronUp, Users, Code, PenTool, PanelLeftOpen, PanelLeftClose, PanelRightOpen, PanelRightClose, Menu, Edit, Folder, FileCode, ChevronRight, FilePlus, Trash2, Plus, X, Zap } from 'lucide-react';
+import { useTheme } from "../context/ThemeContext";
+import { Play, RotateCcw, Copy, LogOut, ChevronDown, ChevronUp, Users, Code, PenTool, PanelLeftOpen, PanelLeftClose, PanelRightOpen, PanelRightClose, Menu, Edit, Folder, FileCode, ChevronRight, FilePlus, Trash2, Plus, X, Zap, Sun, Moon } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import Whiteboard from "./Whiteboard/Board";
 import * as Y from 'yjs';
@@ -33,6 +34,7 @@ const EditorPage = () => {
   const Location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   /* FILE SYSTEM STATE */
   const [files, setFiles] = useState(() => {
@@ -682,18 +684,35 @@ const EditorPage = () => {
             <span style={{ fontSize: '12px', fontWeight: 600 }}>Auto</span>
           </button>
 
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="btn-hover-effect"
+            title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            style={{
+              ...iconButtonStyle,
+              backgroundColor: 'transparent',
+              marginRight: '8px',
+              color: 'var(--text-secondary)'
+            }}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
           <button
             onClick={runCode}
             disabled={isCompiling}
-            title="Run Code"
+            className="run-btn"
+            title="Run Code (Cmd+Enter)"
             style={{
+              ...iconButtonStyle,
               backgroundColor: '#2ea043',
-              border: 'none',
               color: 'white',
-              width: '32px',
-              height: '32px',
-              borderRadius: '4px',
-              cursor: 'pointer',
+              width: 'auto',
+              padding: '0 16px',
+              borderRadius: '6px',
+              gap: '6px',
+              border: 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -701,6 +720,7 @@ const EditorPage = () => {
             }}
           >
             <Play size={18} fill="currentColor" />
+            <span style={{ fontWeight: '600', fontSize: '13px' }}>Run</span>
           </button>
 
           <div style={{ width: '1px', height: '16px', backgroundColor: '#333' }}></div>

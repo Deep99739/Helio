@@ -4,6 +4,7 @@ import * as monaco from "monaco-editor";
 
 // Configure loader to use the local monaco instance
 import { registerLanguageCompletions } from "../utils/languageCompletion";
+import { useTheme } from "../context/ThemeContext";
 loader.config({ monaco });
 
 const getMonacoLanguage = (lang) => {
@@ -37,6 +38,7 @@ const RealtimeEditor = ({
   onEditorMount,
   isAutocompleteEnabled
 }) => {
+  const { theme } = useTheme();
   const editorRef = useRef(null);
 
   const handleEditorDidMount = (editor, monaco) => {
@@ -85,12 +87,19 @@ const RealtimeEditor = ({
     }
   }, [isAutocompleteEnabled]);
 
+  // Sync Theme
+  useEffect(() => {
+    if (editorRef.current && window.monaco) {
+      window.monaco.editor.setTheme(theme === 'dark' ? 'vs-dark' : 'light');
+    }
+  }, [theme]);
+
   return (
     <div style={{ height: "100%", width: "100%" }}>
       <Editor
         height="100%"
         language={getMonacoLanguage(selectedLanguage)}
-        theme="vs-dark"
+        theme={theme === 'dark' ? 'vs-dark' : 'light'}
         options={{
           readOnly: false,
           minimap: { enabled: false },
