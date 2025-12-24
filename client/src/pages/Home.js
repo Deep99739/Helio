@@ -144,7 +144,7 @@ const Home = () => {
                         fontWeight: '400',
                         opacity: 0.8
                     }}>
-                        Collaborate with your team instantly. No signup required. <br /> Just share a link and start coding.
+                        Collaborate with your team instantly. No signup required. <br /> Just share a link and start coding/doodling.
                     </p>
 
                     {/* Glass Card - The Centerpiece */}
