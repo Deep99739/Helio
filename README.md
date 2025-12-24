@@ -46,7 +46,7 @@ graph TD
     subgraph Client_Layer ["💻 Client Layer (React 18)"]
         Landing["Landing Page\n(Room Generation)"]
         Dashboard["User Dashboard\n(History & Social)"]
-        Editor["Editor Engine\n(CodeMirror + Yjs)"]
+        Editor["Editor Engine\n(Monaco + Yjs)"]
     end
     
     subgraph Platform_Layer ["☁️ Platform / Infrastructure"]
@@ -188,7 +188,7 @@ flowchart LR
 | Layer | Technology | Purpose |
 | :--- | :--- | :--- |
 | **Frontend** | React 18 | Declarative UI Library |
-| | CodeMirror 5 | Text Editor Component |
+| | Monaco code editor | Text Editor Component |
 | | Socket.io-Client | Real-time WebSocket Communication |
 | | Axios | HTTP Requests |
 | **Backend** | Node.js & Express | Server Runtime & API Framework |

@@ -13,35 +13,45 @@ import ChatPage from './pages/ChatPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 import Layout from './components/Layout';
 
 function App() {
   return (
     <AuthProvider>
-      <Layout>
-        <div>
-          <Toaster position='top-center'></Toaster>
-        </div>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/auth/success" element={<AuthSuccessPage />} />
-          <Route path="/profile/:username" element={<ProfilePage />} />
-          <Route path="/editor/:roomId" element={<EditorPage />} />
-          <Route path="/500" element={<Error500Page />} />
+      <ThemeProvider>
+        <Layout>
+          <div>
+            <Toaster position='top-center' toastOptions={{
+              style: {
+                background: '#333',
+                color: '#fff',
+                fontFamily: 'var(--font-ui)',
+                fontSize: '14px',
+              },
+            }}></Toaster>
+          </div>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/auth/success" element={<AuthSuccessPage />} />
+            <Route path="/profile/:username" element={<ProfilePage />} />
+            <Route path="/editor/:roomId" element={<EditorPage />} />
+            <Route path="/500" element={<Error500Page />} />
 
-          {/* Protected Routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route path='/dashboard' element={<Dashboard />} />
-            <Route path='/chat' element={<ChatPage />} />
-            <Route path='/chat/:friendId' element={<ChatPage />} />
-          </Route>
-        </Routes>
-      </Layout>
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path='/dashboard' element={<Dashboard />} />
+              <Route path='/chat' element={<ChatPage />} />
+              <Route path='/chat/:friendId' element={<ChatPage />} />
+            </Route>
+          </Routes>
+        </Layout>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

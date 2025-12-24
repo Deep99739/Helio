@@ -178,11 +178,7 @@ footer a {
 }
 
 /* Editor Page Styles (Preserved/Updated) */
-.codemirror {
-    height: calc(100vh - 20px);
-    font-size: 16px;
-    line-height: 1.6;
-}
+
 
 .output-box {
     background-color: #1e293b;
