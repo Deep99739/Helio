@@ -41,6 +41,12 @@ class SocketService {
         socket.on("ELEMENT-UPDATE", (data) => this.handleWhiteboardUpdate(socket, data));
         socket.on("CURSOR-POSITION", (data) => this.handleCursorPosition(socket, data));
 
+        // WebRTC Signaling
+        socket.on(ACTIONS.RTC_OFFER, (data) => this.relayRTC(socket, ACTIONS.RTC_OFFER, data));
+        socket.on(ACTIONS.RTC_ANSWER, (data) => this.relayRTC(socket, ACTIONS.RTC_ANSWER, data));
+        socket.on(ACTIONS.RTC_ICE_CANDIDATE, (data) => this.relayRTC(socket, ACTIONS.RTC_ICE_CANDIDATE, data));
+        socket.on(ACTIONS.MUTE_STATUS_CHANGE, (data) => this.handleMuteStatusChange(socket, data));
+
         socket.on('disconnecting', () => this.handleDisconnecting(socket));
     }
 
@@ -149,6 +155,25 @@ class SocketService {
 
     handleCursorPosition(socket, cursorData) {
         socket.to(cursorData.boardId).emit("CURSOR-POSITION", cursorData);
+    }
+
+    // --- WebRTC Signaling ---
+    relayRTC(socket, action, data) {
+        const { targetSocketId } = data;
+        if (targetSocketId) {
+            this.io.to(targetSocketId).emit(action, {
+                ...data,
+                senderSocketId: socket.id
+            });
+        }
+    }
+
+    handleMuteStatusChange(socket, { roomId, isMicMuted, isVideoMuted }) {
+        socket.to(roomId).emit(ACTIONS.MUTE_STATUS_CHANGE, {
+            socketId: socket.id,
+            isMicMuted,
+            isVideoMuted
+        });
     }
 
     handleDisconnecting(socket) {

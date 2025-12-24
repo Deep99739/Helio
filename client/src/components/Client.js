@@ -1,10 +1,12 @@
 import React from 'react';
 import Avatar from 'react-avatar';
 import { useNavigate } from 'react-router-dom';
+import { useAudioLevel } from '../hooks/useAudioLevel';
 
-function Client({ username, isOwner }) {
+function Client({ username, isOwner, stream }) {
   const navigate = useNavigate();
   const isGuest = username.toString().startsWith("Guest-");
+  const isSpeaking = useAudioLevel(stream);
 
   // Generate initials (e.g., "Deepak Kumar" -> "DK")
   // Simple fallback to first 2 letters if no space
@@ -40,7 +42,9 @@ function Client({ username, isOwner }) {
         <div style={{
           borderRadius: '50%',
           padding: isOwner ? '1px' : '0',
-          background: isOwner ? 'linear-gradient(45deg, #FFD700, #FDB931)' : 'transparent'
+          background: isOwner ? 'linear-gradient(45deg, #FFD700, #FDB931)' : 'transparent',
+          boxShadow: isSpeaking ? '0 0 8px #4ade80' : 'none',
+          transition: 'box-shadow 0.2s'
         }}>
           <Avatar
             name={name}
@@ -50,8 +54,9 @@ function Client({ username, isOwner }) {
             fgColor="#fff"
             textSizeRatio={2}
             style={{
-              border: '2px solid var(--bg-dark)',
-              display: 'block'
+              border: isSpeaking ? '2px solid #4ade80' : '2px solid var(--bg-dark)',
+              display: 'block',
+              transition: 'border 0.2s'
             }}
           />
         </div>

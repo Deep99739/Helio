@@ -110,7 +110,7 @@ const Home = () => {
                         gap: '8px'
                     }}>
                         <span style={{ width: '6px', height: '6px', background: 'var(--accent-green)', borderRadius: '50%', boxShadow: '0 0 8px var(--accent-green)' }}></span>
-                        Helio Editor v2.0
+                        Helix Editor v2.0
                     </div>
 
                     {/* Main Heading */}

@@ -18,6 +18,9 @@ import { Play, RotateCcw, Copy, LogOut, ChevronDown, ChevronUp, Users, Code, Pen
 import { v4 as uuidv4 } from 'uuid';
 import Whiteboard from "./Whiteboard/Board";
 import * as Y from 'yjs';
+import { useWebRTC } from "../hooks/useWebRTC";
+import VideoGrid from "./VideoGrid";
+import { Mic, MicOff, Video, VideoOff } from 'lucide-react';
 
 import { MonacoBinding } from 'y-monaco';
 import { YjsSocketSystem } from '../services/YjsSocketSystem';
@@ -125,6 +128,9 @@ const EditorPage = () => {
   const [isSynced, setIsSynced] = useState(false); // New gate
   const [socketInitialized, setSocketInitialized] = useState(false);
   const isMounted = useRef(false);
+
+  // WebRTC Hook - pass socketRef (the ref object) and socketInitialized to trigger setup when ready
+  const { localStream, peers, toggleAudio, toggleVideo, isMicMuted, isVideoMuted } = useWebRTC(roomId, { username: effectiveUsername }, socketRef, socketInitialized);
 
   const filesRef = useRef(files); // Track files state
   useEffect(() => {
@@ -587,8 +593,11 @@ const EditorPage = () => {
           }} title={isConnected ? "Online" : "Offline"} />
         </div>
 
-        {/* CENTER: MODE TOGGLE (SEGMENTED CONTROL) */}
+        {/* CENTER: MODE TOGGLE (SEGMENTED CONTROL) - Absolutely centered */}
         <div style={{
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
           display: 'flex',
           backgroundColor: '#1e1e1e',
           borderRadius: '20px',
@@ -725,6 +734,26 @@ const EditorPage = () => {
 
           <div style={{ width: '1px', height: '16px', backgroundColor: '#333' }}></div>
 
+          {/* WebRTC Toggles */}
+          <button
+            onClick={toggleAudio}
+            title={isMicMuted ? "Unmute Mic" : "Mute Mic"}
+            style={{ ...iconButtonStyle, color: isMicMuted ? '#f87171' : '#ccc' }}
+            className="hover-bg-dark"
+          >
+            {isMicMuted ? <MicOff size={18} /> : <Mic size={18} />}
+          </button>
+          <button
+            onClick={toggleVideo}
+            title={isVideoMuted ? "Turn Video On" : "Turn Video Off"}
+            style={{ ...iconButtonStyle, color: isVideoMuted ? '#f87171' : '#ccc' }}
+            className="hover-bg-dark"
+          >
+            {isVideoMuted ? <VideoOff size={18} /> : <Video size={18} />}
+          </button>
+
+          <div style={{ width: '1px', height: '16px', backgroundColor: '#333' }}></div>
+
           <button
             title="History"
             style={iconButtonStyle}
@@ -772,7 +801,7 @@ const EditorPage = () => {
           </button>
         </div>
 
-        <div style={{ padding: '0 10px 10px 10px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '10px' }}>
+        {/* ... (File List Logic) ... */}        <div style={{ padding: '0 10px 10px 10px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '10px' }}>
           {/* SRC Folder Mock - Actually lets just list files flat for now or assume src */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 8px', fontSize: '13px', color: 'var(--text-primary)', cursor: 'pointer', backgroundColor: 'transparent', borderRadius: '4px' }}>
             <ChevronDown size={14} />
@@ -929,12 +958,43 @@ const EditorPage = () => {
           </div>
         </div>
 
+        {/* 6. VIDEO GRID (Moved to Sidebar) */}
+        <VideoGrid
+          localStream={localStream}
+          peers={peers}
+          clients={clients}
+          user={{ username: effectiveUsername }}
+          isMicMuted={isMicMuted}
+          isVideoMuted={isVideoMuted}
+        />
+
+
         {/* MEMBERS SECTION */}
         <div style={sectionHeaderStyle}><Users size={14} /> MEMBERS</div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px' }}>
-          {clients.map((client, index) => (
-            <Client key={client.socketId} username={client.username} isOwner={index === 0} />
-          ))}
+          {clients.map((client, index) => {
+            const isMe = client.socketId === socketRef.current?.id; // Assuming socketRef has id or we check username
+            // Actually socketRef.current might not be set or id not ready? 
+            // "clients" list comes from server, includes socketId.
+            // localStream is for me.
+            // peers has remote streams.
+
+            let stream = null;
+            if (client.username === effectiveUsername) {
+              stream = localStream;
+            } else {
+              stream = peers[client.socketId]?.stream;
+            }
+
+            return (
+              <Client
+                key={client.socketId}
+                username={client.username}
+                isOwner={index === 0}
+                stream={stream}
+              />
+            );
+          })}
         </div>
         <div style={{ padding: '10px', borderTop: '1px solid var(--border-subtle)' }}>
           <button
@@ -1243,6 +1303,7 @@ const EditorPage = () => {
           </div>
         )
       }
+
     </div >
   );
 }

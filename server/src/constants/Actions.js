@@ -17,6 +17,10 @@ const ACTIONS = {
   FILE_UPDATED: "file-updated",
   FILE_RENAMED: "file-renamed",
   FILE_DELETED: "file-deleted",
+  RTC_OFFER: "rtc-offer",
+  RTC_ANSWER: "rtc-answer",
+  RTC_ICE_CANDIDATE: "rtc-ice-candidate",
+  MUTE_STATUS_CHANGE: "mute-status-change",
 };
 
 module.exports = ACTIONS;

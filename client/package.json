@@ -16,6 +16,7 @@
     "bootstrap": "^5.3.1",
     "dotenv": "^16.4.5",
     "framer-motion": "^12.23.26",
+    "freeice": "^2.2.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
     "lib0": "^0.2.115",
