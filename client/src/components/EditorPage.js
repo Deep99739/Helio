@@ -18,7 +18,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Whiteboard from "./Whiteboard/Board";
 import * as Y from 'yjs';
 
-import { CodemirrorBinding } from '../utils/CodemirrorBinding';
+import { MonacoBinding } from 'y-monaco';
 import { YjsSocketSystem } from '../services/YjsSocketSystem';
 
 // all language deepak know
@@ -71,8 +71,12 @@ const EditorPage = () => {
   const [renameValue, setRenameValue] = useState("");
 
   // Autocomplete State
+  const [isAutocompleteEnabled, setIsAutocompleteEnabled] = useState(true);
 
-
+  const toggleAutocomplete = () => {
+    setIsAutocompleteEnabled(!isAutocompleteEnabled);
+    toast.success(`Autocomplete ${!isAutocompleteEnabled ? 'Enabled' : 'Disabled'}`);
+  };
 
   const handleRenameSubmit = (fileId) => {
     if (!renameValue.trim()) return setFileIdToRename(null);
@@ -301,7 +305,13 @@ const EditorPage = () => {
 
     // Create new binding
     console.log(`[DEBUG] Binding Editor to File: ${activeFileId}`);
-    bindingRef.current = new CodemirrorBinding(type, editorInstance, providerRef.current.awareness);
+
+    const model = editorInstance.getModel();
+    if (!model) {
+      console.warn('Editor model not found, skipping binding');
+      return;
+    }
+    bindingRef.current = new MonacoBinding(type, model, new Set([editorInstance]), providerRef.current.awareness);
 
   }, [activeFileId, editorInstance]); // providerRef/ydocRef are stable refs
 
@@ -657,6 +667,21 @@ const EditorPage = () => {
           </div>
 
           {/* Run Button (Icon Only) */}
+          <button
+            onClick={toggleAutocomplete}
+            style={{
+              ...iconButtonStyle,
+              color: isAutocompleteEnabled ? '#eab308' : '#666', // Yellow if on
+              display: 'flex',
+              gap: '4px',
+              padding: '6px 10px'
+            }}
+            title={`Toggle Autocomplete (${isAutocompleteEnabled ? 'On' : 'Off'})`}
+          >
+            <Zap size={16} fill={isAutocompleteEnabled ? "currentColor" : "none"} />
+            <span style={{ fontSize: '12px', fontWeight: 600 }}>Auto</span>
+          </button>
+
           <button
             onClick={runCode}
             disabled={isCompiling}
@@ -1022,6 +1047,7 @@ const EditorPage = () => {
                   onCodeChange={(code) => {
                     updateFileContent(code);
                   }}
+                  isAutocompleteEnabled={isAutocompleteEnabled}
                   onEditorMount={onEditorMountCallback}
                 />
               ) : (

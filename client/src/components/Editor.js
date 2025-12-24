@@ -1,37 +1,18 @@
-import React, { useEffect, useRef } from "react";
-import CodeMirror from "codemirror";
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/dracula.css";
-import "codemirror/addon/edit/closetag";
-import "codemirror/addon/edit/closebrackets";
-import "codemirror/addon/selection/active-line";
+import React, { useRef, useEffect } from "react";
+import Editor, { loader } from "@monaco-editor/react";
+import * as monaco from "monaco-editor";
 
-// Language Modes
-import "codemirror/mode/javascript/javascript";
-import "codemirror/mode/python/python";
-import "codemirror/mode/clike/clike";
-import "codemirror/mode/ruby/ruby";
-import "codemirror/mode/go/go";
-import "codemirror/mode/shell/shell";
-import "codemirror/mode/sql/sql";
-import "codemirror/mode/pascal/pascal";
-import "codemirror/mode/php/php";
-import "codemirror/mode/swift/swift";
-import "codemirror/mode/rust/rust";
-import "codemirror/mode/r/r";
+// Configure loader to use the local monaco instance
+loader.config({ monaco });
 
-import { ACTIONS } from "../config/Actions";
-import "codemirror/addon/hint/show-hint";
-import "codemirror/addon/hint/show-hint.css";
-
-const getMode = (lang) => {
+const getMonacoLanguage = (lang) => {
   switch (lang) {
     case "python3": return "python";
-    case "java": return "text/x-java";
-    case "cpp": return "text/x-c++src";
-    case "c": return "text/x-csrc";
-    case "csharp": return "text/x-csharp";
-    case "scala": return "text/x-scala";
+    case "java": return "java";
+    case "cpp": return "cpp";
+    case "c": return "c";
+    case "csharp": return "csharp";
+    case "scala": return "scala";
     case "nodejs": return "javascript";
     case "ruby": return "ruby";
     case "go": return "go";
@@ -46,85 +27,75 @@ const getMode = (lang) => {
   }
 };
 
-function Editor({ socketRef, roomId, onCodeChange, initialCode, selectedLanguage, fileId, onEditorMount, isAutocompleteEnabled }) {
+const RealtimeEditor = ({
+  socketRef,
+  roomId,
+  onCodeChange,
+  initialCode,
+  selectedLanguage,
+  onEditorMount,
+  isAutocompleteEnabled
+}) => {
   const editorRef = useRef(null);
 
-  // Track autocomplete prop in a Ref to access inside closures without stale state
-  const autocompleteRef = useRef(isAutocompleteEnabled);
+  const handleEditorDidMount = (editor, monaco) => {
+    editorRef.current = editor;
 
-  useEffect(() => {
-    const init = async () => {
-      const editor = CodeMirror.fromTextArea(
-        document.getElementById("realtimeEditor"),
-        {
-          mode: { name: "javascript", json: true },
-          theme: "dracula",
-          autoCloseTags: true,
-          autoCloseBrackets: true,
-          lineNumbers: true,
-          styleActiveLine: true,
-          extraKeys: {
-            "Ctrl-Space": "autocomplete",
-            "Tab": (cm) => {
-              if (cm.state.completionActive) {
-                cm.state.completionActive.pick();
-              } else {
-                cm.execCommand("indentMore");
-              }
-            }
-          },
-          hintOptions: {
-            completeSingle: false,
-            extraKeys: {
-              "Tab": (cm, handle) => {
-                handle.pick();
-              }
-            }
-          }
-        }
-      );
-      editorRef.current = editor;
-
-      // New Standard Prop
-      if (onEditorMount) {
-        onEditorMount(editor);
-      }
-
-      // Keep legacy for now if needed, but onEditorMount is preferred
-      if (window.onEditorMount) window.onEditorMount(editor);
-
-
-      if (initialCode !== null && initialCode !== undefined) {
-        editor.setValue(initialCode);
-      } else {
-        editor.setValue("");
-      }
-
-      editor.setSize(null, "100%");
-
-      editor.on("change", (instance, changes) => {
-        const { origin } = changes;
-        const code = instance.getValue();
-        onCodeChange(code);
-      });
-    };
-
-    init();
-  }, []); // Run once
-
-  // Update Language Mode dynamically
-  useEffect(() => {
-    if (editorRef.current && selectedLanguage) {
-      const mode = getMode(selectedLanguage);
-      editorRef.current.setOption("mode", mode);
+    // Set initial value if provided and not empty (though YJS will overwrite usually)
+    if (initialCode) {
+      editor.setValue(initialCode);
     }
-  }, [selectedLanguage]);
+
+    // Configure editor
+    editor.updateOptions({
+      minimap: { enabled: false },
+      fontSize: 14,
+      wordWrap: 'on',
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+    });
+
+    // Pass editor instance up for YJS binding
+    if (onEditorMount) {
+      onEditorMount(editor);
+    }
+
+    // Legacy support if needed
+    if (window.onEditorMount) window.onEditorMount(editor);
+
+    editor.onDidChangeModelContent(() => {
+      const code = editor.getValue();
+      onCodeChange(code);
+    });
+  };
+
+  // Toggle Autocomplete dynamically
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.updateOptions({
+        quickSuggestions: isAutocompleteEnabled,
+        suggestOnTriggerCharacters: isAutocompleteEnabled,
+        parameterHints: { enabled: isAutocompleteEnabled },
+        tabCompletion: isAutocompleteEnabled ? "on" : "off",
+      });
+    }
+  }, [isAutocompleteEnabled]);
 
   return (
-    <div style={{ height: "100%" }}>
-      <textarea id="realtimeEditor"></textarea>
+    <div style={{ height: "100%", width: "100%" }}>
+      <Editor
+        height="100%"
+        language={getMonacoLanguage(selectedLanguage)}
+        theme="vs-dark"
+        options={{
+          readOnly: false,
+          minimap: { enabled: false },
+          fontSize: 14,
+        }}
+        onMount={handleEditorDidMount}
+      />
     </div>
   );
-}
+};
 
-export default React.memo(Editor);
+export default React.memo(RealtimeEditor);
