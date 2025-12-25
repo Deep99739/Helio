@@ -61,7 +61,7 @@ const EditorPage = () => {
   // Derived state for active file
   const activeFile = files.find(f => f.id === activeFileId);
   // Derived Language
-  const selectedLanguage = activeFile?.language || "javascript";
+  const selectedLanguage = activeFile?.language || "nodejs";
 
   const codeRef = useRef(null); // Keeps track of ACTIVE file content for frequent updates
 
@@ -821,8 +821,8 @@ const EditorPage = () => {
                     if (e.key === 'Enter') {
                       if (newFileName.trim()) {
                         const ext = newFileName.split('.').pop();
-                        const langMap = { 'js': 'javascript', 'py': 'python3', 'java': 'java', 'cpp': 'cpp', 'c': 'c', 'go': 'go', 'rs': 'rust' };
-                        createNewFile(newFileName.trim(), langMap[ext] || 'javascript');
+                        const langMap = { 'js': 'nodejs', 'py': 'python3', 'java': 'java', 'cpp': 'cpp', 'c': 'c', 'go': 'go', 'rs': 'rust' };
+                        createNewFile(newFileName.trim(), langMap[ext] || 'nodejs');
                       }
                       setIsCreatingFile(false);
                     } else if (e.key === 'Escape') {
@@ -1029,7 +1029,7 @@ const EditorPage = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '15px', marginBottom: '40px' }}>
-              <button onClick={() => createNewFile('main.js', 'javascript')} style={{ ...iconButtonStyle, width: '80px', height: '80px', flexDirection: 'column', gap: '10px', background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)' }}>
+              <button onClick={() => createNewFile('main.js', 'nodejs')} style={{ ...iconButtonStyle, width: '80px', height: '80px', flexDirection: 'column', gap: '10px', background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)' }}>
                 <span style={{ fontSize: '24px', color: '#f7df1e' }}>JS</span>
                 <span style={{ fontSize: '12px' }}>JavaScript</span>
               </button>
