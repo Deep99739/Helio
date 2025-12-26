@@ -23,14 +23,24 @@
 *   **Session Management**: Stateless authentication using **JWT (JSON Web Tokens)** with secure HTTP headers.
 *   **Password Security**: Industry-standard **Bcrypt** hashing strategies.
 
-### 3. ⚡ Code Execution Engine
+### 3. ⚡ Smart Editor & Code Runner
+*   **Intelligent Auto-Complete**: Client-side IntelliSense for C++, Python, and Java, providing syntax suggestions as you type.
 *   **Multi-Language Support**: Run C++, Python, Java, JavaScript, and more directly in the browser.
 *   **Sandboxed Environment**: Powered by the **Piston API** for secure, isolated code execution.
-*   **Unlimited Scale**: No rate limits or local binaries required on the host server.
+*   **Execution Audit Logs**: Every code execution is logged with timestamp and source snapshot for security compliance.
 
 ### 4. 🎨 Smart UI & Whiteboard
 *   **Integrated Whiteboard**: A shared infinite canvas for system design diagrams (Architecture, Flowcharts).
 *   **Atomic Design System**: A custom-built UI library using glassmorphism and semantic CSS variables.
+
+### 5. 🎥 Real-Time Video & Voice
+*   **Mesh Topology**: Direct Peer-to-Peer (P2P) connections ensuring lowest possible latency for video and audio.
+*   **Active Speaker Detection**: Intelligent visual highlighting of who is currently speaking.
+*   **Privacy First**: Media streams are encrypted and flow directly between users, bypassing the server.
+
+### 6. 🌓 Modern Theming
+*   **Light & Dark Mode**: Fully supported themes with a smart toggle that persists user preference.
+*   **Dynamic Styling**: Powered by React Context and CSS Variables for instant, glitch-free switching.
 
 ---
 
@@ -93,7 +103,11 @@ graph TD
     
     Editor --> Exec
     Exec <--> Piston
+    Exec <--> Piston
     Exec --> Logs
+
+    %% WebRTC P2P Flow
+    Client_Layer <--> Mesh((WebRTC\nP2P Mesh))
 ```
 
 ### 2. Authentication & Room Lifecycle
@@ -189,6 +203,7 @@ flowchart LR
 | :--- | :--- | :--- |
 | **Frontend** | React 18 | Declarative UI Library |
 | | Monaco code editor | Text Editor Component |
+| | WebRTC API | P2P Video/Audio Streaming |
 | | Socket.io-Client | Real-time WebSocket Communication |
 | | Axios | HTTP Requests |
 | **Backend** | Node.js & Express | Server Runtime & API Framework |
