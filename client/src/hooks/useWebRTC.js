@@ -248,6 +248,7 @@ export const useWebRTC = (roomId, user, socketRef, socketInitialized) => {
             socket.off(ACTIONS.MUTE_STATUS_CHANGE, handleMuteStatus);
             socket.off(ACTIONS.DISCONNECTED, handleDisconnect);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketInitialized, roomId, createPeerConnection, processOffer, addQueuedIceCandidates]);
 
     // Media controls

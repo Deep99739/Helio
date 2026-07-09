@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SearchBar from '../components/SearchBar';
-import { Plus, Users, Clock, Zap, LogIn, ArrowRight, Activity, Check, X } from 'lucide-react';
+import { Plus, Users, Clock, Zap, LogIn, ArrowRight, Check, X } from 'lucide-react';
 import axios from 'axios';
 import { initSocket } from '../services/Socket';
 import { ACTIONS } from '../config/Actions';
@@ -79,9 +79,6 @@ const Dashboard = () => {
         };
     }, [user]);
 
-    const createNewRoom = () => {
-        setIsCreateModalOpen(true);
-    };
 
     const handleCreateRoom = async (roomName) => {
         setIsCreateModalOpen(false);

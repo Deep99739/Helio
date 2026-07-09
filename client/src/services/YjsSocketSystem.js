@@ -1,7 +1,7 @@
 import * as Y from 'yjs';
 import { Awareness } from 'y-protocols/awareness'; // Ensure y-protocols is installed
 import { Observable } from 'lib0/observable';
-import { ACTIONS } from '../config/Actions';
+
 
 /**
  * Custom Yjs Provider for Socket.io

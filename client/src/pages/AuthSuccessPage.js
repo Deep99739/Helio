@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const AuthSuccessPage = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { setToken, setUser } = useAuth(); // Need to expose setters or reload method
 
     useEffect(() => {
         const token = searchParams.get('token');

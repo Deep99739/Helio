@@ -47,6 +47,7 @@ export const AuthProvider = ({ children }) => {
         } else {
             setLoading(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token]);
 
     // Axios interceptor to handle 401s globally
@@ -65,6 +66,7 @@ export const AuthProvider = ({ children }) => {
         return () => {
             axios.interceptors.response.eject(interceptor);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const login = async (email, password) => {
